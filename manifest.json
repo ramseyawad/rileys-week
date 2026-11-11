@@ -1,0 +1,20 @@
+{
+ "name": "Riley's Week",
+ "short_name": "Riley's Week",
+ "start_url": "./",
+ "display": "standalone",
+ "background_color": "#FFFDF7",
+ "theme_color": "#FFFDF7",
+ "icons": [
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-180.png",
+   "sizes": "180x180",
+   "type": "image/png"
+  }
+ ]
+}
