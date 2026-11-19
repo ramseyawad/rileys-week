@@ -1,0 +1,23 @@
+# Pings the Supabase database every 3 days so the free project isn't paused for inactivity.
+# Uses no secrets: it calls the locked get_state function with a dummy key, which runs a
+# real database query and is then refused (no data is returned).
+name: Keep database awake
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "https://pucxrsdndgnozocrphyu.supabase.co/rest/v1/rpc/get_state" \
+            -H "apikey: sb_publishable_iVdi0TqgVxXCJaOJa3xYdA_DDQ6QuEd" \
+            -H "Content-Type: application/json" \
+            -d '{"k":"keep-awake"}')
+          echo "Supabase answered HTTP $code"
+          # 400 = database ran the query and refused the dummy key (healthy).
+          # Anything 5xx or 000 usually means the project is paused.
+          if [ "$code" != "400" ] && [ "$code" != "200" ]; then exit 1; fi
