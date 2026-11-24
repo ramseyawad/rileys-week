@@ -100,6 +100,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
       </div>
       <div class="toolbar">
         <label class="switch"><input type="checkbox" id="showDone"> Show completed today</label>
+        <button class="btn pri" id="shareAll" style="margin-left:auto">📤 Send to group</button>
         <select id="sortBy" style="width:auto"><option value="tail">Sort by tail</option><option value="bay">Sort by bay</option><option value="status">Sort by status</option><option value="new">Newest first</option></select>
       </div>
       <div class="tbl-wrap">
@@ -296,7 +297,7 @@ function renderBoard(){
       <td class="task-text">${esc(j.task)}</td>
       <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" ("+where(e.id)+")":""}</option>`).join("")}</select></div>`}</td>
       <td>${st}</td>
-      <td style="white-space:nowrap">${btns} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
+      <td style="white-space:nowrap">${btns} ${done?"":`<button class="btn sm" data-share="${j.id}" title="Send this job as a text">📤</button>`} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
     </tr>`}).join("")||`<tr><td colspan="6" class="empty">No open jobs. Add one above.</td></tr>`;
 
   const freeE=onShift.filter(e=>!w[e.id]);
@@ -310,6 +311,7 @@ $("#jobs").addEventListener("click",e=>{
   if(t.dataset.un){const[j,en]=t.dataset.un.split("|");unassign(j,en)}
   else if(t.dataset.done)complete(t.dataset.done);
   else if(t.dataset.start)start(t.dataset.start);
+  else if(t.closest("[data-share]"))share(jobText(job(t.closest("[data-share]").dataset.share),true));
   else if(t.dataset.stop)stop(t.dataset.stop);
   else if(t.dataset.reopen)reopen(t.dataset.reopen);
   else if(t.dataset.del)del(t.dataset.del);
@@ -319,6 +321,34 @@ $("#jobs").addEventListener("change",e=>{
   if(t.dataset.add)assign(t.dataset.add,t.value);
   else if(t.dataset.f)editField(t.dataset.id,t.dataset.f,t.value.trim());
 });
+
+/* ---------- send as text ---------- */
+const stamp=()=>new Date().toLocaleString("en-GB",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+function jobText(j,head){
+  const who=current(j).map(engName);
+  const state=j.status==="work"?"IN WORK":j.status==="planned"?"NEXT – not started":"UNMANNED";
+  const tasks=j.task.split("\n").map(t=>t.trim()).filter(Boolean);
+  return (head?"Tasking update "+stamp()+"\n\n":"")+
+    `${j.tail}${j.bay?" – Bay "+j.bay:""} (${state})\n`+
+    tasks.map(t=>"• "+t).join("\n")+"\n"+
+    "👷 "+(who.length?who.join(", "):"Nobody assigned yet");
+}
+function boardText(){
+  const order={work:0,planned:1,open:2};
+  const jobs=D.jobs.filter(active).sort((a,b)=>order[a.status]-order[b.status]||TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail));
+  const {w}=jobMaps();
+  const free=D.engineers.filter(e=>e.onShift&&!w[e.id]&&!jobs.some(j=>current(j).includes(e.id))).map(e=>e.name);
+  return "Tasking update "+stamp()+"\n\n"+
+    (jobs.length?jobs.map(j=>jobText(j,false)).join("\n\n"):"No jobs open")+
+    (free.length?"\n\nNot tasked – stand by: "+free.join(", "):"");
+}
+async function share(text){
+  if(navigator.share){try{await navigator.share({text});return}catch(e){if(e.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(text);toast("Copied – paste it into the group chat")}
+  catch(e){prompt("Copy this and paste it into the group:",text)}
+}
+function toast(m){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;z-index:9";document.body.append(t)}t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",2500)}
+$("#shareAll").onclick=()=>share(boardText());
 
 /* ---------- shift ---------- */
 $("#addEngs").onclick=()=>{
