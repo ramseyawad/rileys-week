@@ -178,6 +178,21 @@ tr:last-child td{border-bottom:0}
 .namein{padding:5px 8px;border-color:transparent;font-weight:600;max-width:320px}.namein:hover{border-color:var(--line2)}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
 .count{float:right}
+/* new-job window */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(11,18,32,.55);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto;animation:fade .15s}
+@keyframes fade{from{opacity:0}}
+.mcard{width:min(760px,100%);box-shadow:0 24px 60px rgba(0,0,0,.3)!important;animation:pop .18s}
+@keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}}
+.mhead{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.mhead h2{font-size:15px;margin:0}
+.mhead .btn{margin-left:auto}
+.mcard .jh .tailsel{font-size:28px;border:1px solid var(--line2);border-radius:8px;padding:2px 8px}
+.mcard .bayf{font-size:24px}.mcard .bayf input{width:80px;font-size:16px;padding:5px 8px;border-color:var(--line2);background:#fff}
+.mcard .jr .jl{font-size:13px}
+.mcard #nTask{font-weight:600}
+.msec{padding:12px 14px;border-top:1px solid var(--line);background:#FAFBFD}
+.msec .engbar{margin-bottom:8px}
+.jr .hint{font-size:12.5px;color:var(--mute);font-style:italic;padding:4px 0}
 /* trades & roster */
 .tradestrip{display:flex;gap:10px;margin:-4px 0 16px;flex-wrap:wrap}
 .tradestrip:empty{display:none}
@@ -305,21 +320,8 @@ th.today,td.today{background:#FFFBEB}
   <div class="grid">
     <div class="stack">
       <div class="card">
-        <div class="card-h"><h2>Raise a job</h2><span class="sub" style="margin-left:auto">Ctrl + Enter to add</span></div>
-        <div class="card-b newjob">
-          <div><label class="f" for="nTail">Aircraft</label><select id="nTail"></select></div>
-          <div><label class="f" for="nBay">Bay</label><input id="nBay" placeholder="e.g. 3"></div>
-          <div class="engf"><label class="f">Engineers</label>
-            <div class="engbar"><select id="nTrade"></select><label class="switch"><input type="checkbox" id="nBusy"> Include busy</label><span class="selcount" id="nSelCount"></span></div>
-            <div id="nEng" class="picker"></div></div>
-          <div class="tasks">
-            <div><label class="f" for="nTask">Task(s) – one per line</label><textarea id="nTask" rows="2" placeholder="e.g. No.2 engine oil replen&#10;Fwd door seal inspection"></textarea></div>
-            <button class="btn pri big" id="addJob"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add job</button>
-          </div>
-        </div>
-      </div>
-      <div class="card">
         <div class="jobs-h">
+          <button class="btn pri" id="openNew" title="Raise a new job (N)"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Raise a job</button>
           <h2>Jobs</h2>
           <div class="pills" id="pills">
             <button data-f="active" class="on">Open <i id="pcActive">0</i></button>
@@ -418,6 +420,24 @@ th.today,td.today{background:#FFFBEB}
 </main>
 
 
+<div id="nj" class="modal hide" role="dialog" aria-modal="true" aria-labelledby="njTitle">
+  <div class="mcard job st-open">
+    <div class="mhead"><h2 id="njTitle">New job</h2><span class="sub">Ctrl + Enter to add · Esc to close</span><button class="btn icon" id="njClose" title="Close">
+      <svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="jh">
+      <select id="nTail" class="tailsel"></select>
+      <label class="bayf">(<span>BAY</span><input id="nBay" placeholder="–">)</label>
+    </div>
+    <div id="nSummary"></div>
+    <div class="jr"><div class="jl">Job</div><div class="jtask"><textarea id="nTask" rows="3" placeholder="One task per line, e.g.&#10;3,6,7 day GOOPs&#10;Re A/F toilet"></textarea></div></div>
+    <div class="msec">
+      <div class="engbar"><select id="nTrade"></select><label class="switch"><input type="checkbox" id="nBusy"> Include busy</label><span class="selcount" id="nSelCount"></span></div>
+      <div id="nEng" class="picker"></div>
+    </div>
+    <div class="jf"><span class="sub">Engineers are lined up – press Start on the card when they crack on</span><div class="acts"><button class="btn" id="njCancel">Cancel</button><button class="btn pri" id="addJob"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add job</button></div></div>
+  </div>
+</div>
+
 <div id="display" class="hide">
   <button class="db-exit" id="dbExit">✕ Exit (Esc)</button>
   <div class="db-top">
@@ -496,15 +516,16 @@ $("#addJob").onclick=()=>{
   D.jobs.push({id:uid(),tail:$("#nTail").value,bay:$("#nBay").value.trim(),task,status:engs.length?"planned":"open",
     created:now(),started:null,completed:null,assignments:engs.map(e=>({eng:e,from:null,to:null}))});
   $("#nTask").value="";$("#nBay").value="";
-  PICK.clear();
+  PICK.clear();closeNew();
   save();toast("Job added – "+D.jobs[D.jobs.length-1].tail);$("#nTask").focus();
 };
 ["#nTask","#nBay"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("#addJob").click()}}));
 $("#nBay").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.ctrlKey&&!e.metaKey){e.preventDefault();$("#nTask").focus()}});
 $("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(!b)return;PICK.has(b.dataset.id)?PICK.delete(b.dataset.id):PICK.add(b.dataset.id);renderPicker()});
+$("#nSummary").addEventListener("click",e=>{const b=e.target.closest("[data-unpick]");if(b){PICK.delete(b.dataset.unpick);renderPicker()}});
 $("#nTrade").onchange=()=>{try{localStorage.setItem("wa-pick-trade2",$("#nTrade").value)}catch(e){}renderPicker()};
 $("#nBusy").onchange=renderPicker;
-$("#tradeStrip").addEventListener("click",e=>{const c=e.target.closest(".tcell");if(!c)return;const v=$("#nTrade").value===c.dataset.t?"":c.dataset.t;$("#nTrade").value=v;$("#nTrade").dispatchEvent(new Event("change"));render();$("#nTrade").scrollIntoView({behavior:"smooth",block:"center"})});
+$("#tradeStrip").addEventListener("click",e=>{const c=e.target.closest(".tcell");if(!c)return;openNew();$("#nTrade").value=c.dataset.t;$("#nTrade").dispatchEvent(new Event("change"));render()});
 let FILTER="active";
 $("#sortBy").onchange=render;$("#q").addEventListener("input",render);
 const setFilter=f=>{FILTER=f;document.querySelectorAll("#pills button").forEach(b=>b.classList.toggle("on",b.dataset.f===f));render()};
@@ -560,6 +581,14 @@ function av(id){const n=engName(id);let h=0;for(const c of id)h=(h*31+c.charCode
 const IC={play:`<svg class="i" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,check:`<svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,pause:`<svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,send:`<svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>`,trash:`<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`,undo:`<svg class="i" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>`,x:`<svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>`,clock:`<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`};
 const ago=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 const PICK=new Set();
+function openNew(){$("#nj").classList.remove("hide");renderPicker();setTimeout(()=>$("#nTail").focus(),30)}
+function closeNew(){$("#nj").classList.add("hide")}
+$("#openNew").onclick=openNew;$("#njClose").onclick=closeNew;$("#njCancel").onclick=closeNew;
+$("#nj").addEventListener("mousedown",e=>{if(e.target.id==="nj")closeNew()});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&!$("#nj").classList.contains("hide")){closeNew();return}
+  if((e.key==="n"||e.key==="N")&&!e.ctrlKey&&!e.metaKey&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)&&$("#display").classList.contains("hide")&&!$("#tab-board").classList.contains("hide")){e.preventDefault();openNew()}
+});
 function renderPicker(){
   const {w,p}=jobMaps();
   const onShift=D.engineers.filter(e=>e.onShift).sort(byTrade);
@@ -580,7 +609,12 @@ function renderPicker(){
   const hidden=(t===""?onShift:g[+t]).filter(e=>w[e.id]&&!PICK.has(e.id)).length;
   $("#nEng").innerHTML=!onShift.length?`<span class="sub">Nobody on shift yet – add your team in <a href="#" id="goShift">Shift list</a></span>`
     :(others.map(pb).join("")+list.map(pb).join("")||`<span class="sub">Nobody free in this trade</span>`)+(hidden&&!busyOK?`<span class="sub" style="margin-left:4px">+${hidden} busy</span>`:"");
-  $("#goShift")?.addEventListener("click",e=>{e.preventDefault();document.querySelector('nav button[data-tab=shift]').click()});
+  $("#goShift")?.addEventListener("click",e=>{e.preventDefault();closeNew();document.querySelector('nav button[data-tab=shift]').click()});
+  const sel=[...PICK].map(eng).filter(Boolean);
+  const SL=[["B1",e=>tradeIx(e)===1,"Cert"],["B2",e=>tradeIx(e)===2,"Cert"],["Mechs",e=>tradeIx(e)>2,"A+ / A Cat"],["Other",e=>tradeIx(e)===0,""]];
+  $("#nSummary").innerHTML=SL.map(([l,f,sub],i)=>{const list=sel.filter(f);if(i===3&&!list.length)return "";
+    return `<div class="jr"><div class="jl">${l}<small>${sub}</small></div><div class="chips">${list.map(e=>`<span class="chip">${av(e.id)}${esc(e.name)}<button type="button" data-unpick="${e.id}" title="Remove">${IC.x}</button></span>`).join("")||`<span class="hint">Pick below${i<2?` – choose ${l} Cert in the trade list`:""}</span>`}</div></div>`}).join("");
+  $("#nj .mcard").className="mcard job st-"+(sel.length?"planned":"open");
   $("#nSelCount").innerHTML=PICK.size?`<b>${PICK.size}</b> selected <button type="button" class="linkbtn" id="nClear">Clear</button>`:"";
   $("#nClear")?.addEventListener("click",()=>{PICK.clear();renderPicker()});
 }
@@ -607,7 +641,7 @@ function renderBoard(){
   if(q)jobs=jobs.filter(j=>(j.tail+" "+j.bay+" "+j.task+" "+j.assignments.map(a=>engName(a.eng)).join(" ")).toLowerCase().includes(q));
   const s=$("#sortBy").value, rank={work:0,planned:1,open:2,done:3};
   jobs=[...jobs].sort((a,b)=>s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]||TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail));
-  const emptyMsg={active:["No open jobs","Raise a job above to get started."],work:["Nothing in work","Press Start on a job when the team cracks on."],planned:["Nothing waiting to start",""],open:["No unmanned jobs","Every open job has someone on it."],done:["Nothing completed this shift yet",""]}[FILTER];
+  const emptyMsg={active:["No open jobs","Press Raise a job (or N) to add one."],work:["Nothing in work","Press Start on a job when the team cracks on."],planned:["Nothing waiting to start",""],open:["No unmanned jobs","Every open job has someone on it."],done:["Nothing completed this shift yet",""]}[FILTER];
   // role rows on each job card: Cert = B1/B2, Mechs = A Cat / A+ trades, Other = management / no trade
   const ROLES=[["B1",[1],"Cert"],["B2",[2],"Cert"],["Mechs",[3,4,5,6],"A+ / A Cat"],["Other",[0],""]];
   const roleOf=e=>{const t=tradeIx(e);return t===1?0:t===2?1:t===0?3:2};
