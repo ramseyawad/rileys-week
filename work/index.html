@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F172A">
+<title>Work Allocation</title>
+<style>
+:root{--bg:#F1F5F9;--card:#fff;--ink:#0F172A;--mute:#64748B;--line:#E2E8F0;--blue:#1D4ED8;--green:#15803D;--greenbg:#DCFCE7;--amber:#B45309;--amberbg:#FEF3C7;--red:#B91C1C;--redbg:#FEE2E2;--grey:#94A3B8}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{background:var(--ink);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0;letter-spacing:.3px}
+header .clock{margin-left:auto;font-variant-numeric:tabular-nums;color:#CBD5E1}
+nav{display:flex;gap:4px}
+nav button{background:transparent;color:#CBD5E1;border:0;padding:8px 14px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer}
+nav button.on{background:#1E293B;color:#fff}
+main{padding:16px;max-width:1500px;margin:0 auto}
+.grid{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--mute);padding:8px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.done td{opacity:.55}
+select,input,textarea{font:inherit;padding:8px 10px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:40px}
+button.btn{font:inherit;font-weight:600;padding:8px 12px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;cursor:pointer;white-space:nowrap}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+button.ok{background:var(--green);border-color:var(--green);color:#fff}
+button.warn{color:var(--red);border-color:#FCA5A5}
+button.sm{padding:4px 8px;font-size:13px}
+.addrow{display:grid;grid-template-columns:150px 110px 1fr 220px auto;gap:8px;align-items:start;margin-bottom:14px}
+@media(max-width:800px){.addrow{grid-template-columns:1fr 1fr}.addrow .task,.addrow .engs{grid-column:1/-1}}
+.tail{font-weight:800;font-size:16px;white-space:nowrap}
+.tail.off{color:var(--amber)}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#E0E7FF;color:#1E3A8A;border-radius:999px;padding:3px 4px 3px 10px;margin:2px 4px 2px 0;font-weight:600;font-size:13px}
+.chip button{border:0;background:#C7D2FE;color:#1E3A8A;border-radius:999px;width:20px;height:20px;cursor:pointer;line-height:1;font-size:13px}
+.chip.past{background:#F1F5F9;color:var(--mute);text-decoration:line-through;padding-right:10px}
+.status{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px;white-space:nowrap}
+.s-open{background:var(--amberbg);color:var(--amber)}
+.s-work{background:#DBEAFE;color:var(--blue)}
+.s-done{background:var(--greenbg);color:var(--green)}
+.sub{color:var(--mute);font-size:12px}
+.people .p{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;margin-bottom:5px;font-weight:600}
+.p.free{background:var(--greenbg);color:var(--green)}
+.p.busy{background:#EFF6FF;color:var(--blue)}
+.p.off{background:#F8FAFC;color:var(--grey);font-weight:500}
+.p small{font-weight:500;font-size:12px;text-align:right}
+.count{float:right;background:var(--ink);color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
+.task-text{white-space:pre-wrap}
+.inline-add select{width:auto;padding:3px 6px;font-size:13px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters>*{width:auto;flex:1 1 140px}
+.empty{color:var(--mute);text-align:center;padding:24px}
+.tbl-wrap{overflow-x:auto}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.stat b{display:block;font-size:20px}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.switch input{width:20px;height:20px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Work Allocation</h1>
+  <nav>
+    <button data-tab="board" class="on">Board</button>
+    <button data-tab="shift">Shift list</button>
+    <button data-tab="history">History</button>
+  </nav>
+  <span class="clock" id="clock"></span>
+</header>
+
+<main>
+<!-- BOARD -->
+<section id="tab-board">
+  <div class="grid">
+    <div class="card">
+      <h2>New job</h2>
+      <div class="addrow">
+        <select id="nTail"></select>
+        <input id="nBay" placeholder="Bay">
+        <textarea id="nTask" class="task" placeholder="Task / tasks"></textarea>
+        <select id="nEng" class="engs" multiple size="3" title="Hold Ctrl / Cmd to pick more than one"></select>
+        <button class="btn pri" id="addJob">Add job</button>
+      </div>
+      <div class="toolbar">
+        <label class="switch"><input type="checkbox" id="showDone"> Show completed today</label>
+        <select id="sortBy" style="width:auto"><option value="tail">Sort by tail</option><option value="bay">Sort by bay</option><option value="new">Newest first</option></select>
+      </div>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Tail</th><th>Bay</th><th>Task(s)</th><th>Engineer(s)</th><th>Status</th><th></th></tr></thead>
+        <tbody id="jobs"></tbody>
+      </table>
+      </div>
+    </div>
+    <div>
+      <div class="card people">
+        <h2>Available <span class="count" id="cFree">0</span></h2>
+        <div id="freeList"></div>
+      </div>
+      <div class="card people" style="margin-top:12px">
+        <h2>Tasked <span class="count" id="cBusy">0</span></h2>
+        <div id="busyList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHIFT -->
+<section id="tab-shift" class="hide">
+  <div class="grid">
+    <div class="card">
+      <h2>Shift list</h2>
+      <div class="toolbar">
+        <button class="btn" id="allOn">All on shift</button>
+        <button class="btn" id="allOff">Clear shift (new shift)</button>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>On shift</th><th>Jobs done</th><th></th></tr></thead>
+        <tbody id="engs"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Add engineers</h2>
+      <p class="sub">One per line, e.g. <i>Cpl Smith</i>. You can paste a whole list.</p>
+      <textarea id="engPaste" rows="8"></textarea>
+      <button class="btn pri" id="addEngs" style="margin-top:8px;width:100%">Add to list</button>
+      <h2 style="margin-top:20px">Backup</h2>
+      <p class="sub">Records are saved on this device. Export a backup now and then.</p>
+      <div class="toolbar">
+        <button class="btn" id="exportJson">Export backup</button>
+        <label class="btn">Import backup<input type="file" id="importJson" accept=".json" hidden></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="tab-history" class="hide">
+  <div class="card">
+    <h2>Record of work</h2>
+    <div class="filters">
+      <select id="fEng"><option value="">All engineers</option></select>
+      <select id="fTail"><option value="">All tails</option></select>
+      <input type="date" id="fFrom" title="From">
+      <input type="date" id="fTo" title="To">
+      <input id="fText" placeholder="Search task / bay">
+      <button class="btn" id="exportCsv">Export CSV</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Completed</th><th>Tail</th><th>Bay</th><th>Task(s)</th><th>Engineer(s)</th><th>Raised</th><th>Duration</th></tr></thead>
+      <tbody id="hist"></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+(()=>{
+const KEY="wa-data-v1";
+const TAILS=[...Array(22)].map((_,i)=>"ZM"+(400+i)).concat(["Off Aircraft"]);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const now=()=>new Date().toISOString();
+const fmt=iso=>iso?new Date(iso).toLocaleString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+const dur=(a,b)=>{if(!a||!b)return"";const m=Math.round((new Date(b)-new Date(a))/60000);return m<60?m+"m":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
+
+let D;
+try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!D||!Array.isArray(D.jobs))D={engineers:[],jobs:[]};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){alertMsg("Couldn't save on this device")}render()};
+const alertMsg=m=>console.warn(m);
+
+const eng=id=>D.engineers.find(e=>e.id===id);
+const engName=id=>nameOf(id);
+const active=j=>j.status!=="done";
+const current=j=>j.assignments.filter(a=>!a.to).map(a=>a.eng);
+const busyMap=()=>{const m={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>(m[e]=m[e]||[]).push(j)));return m};
+
+/* ---------- tabs & clock ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  ["board","shift","history"].forEach(t=>$("#tab-"+t).classList.toggle("hide",t!==b.dataset.tab));
+  render();
+});
+const tick=()=>$("#clock").textContent=new Date().toLocaleString("en-GB",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+tick();setInterval(tick,30000);
+
+/* ---------- board ---------- */
+$("#nTail").innerHTML=TAILS.map(t=>`<option>${t}</option>`).join("");
+$("#addJob").onclick=()=>{
+  const task=$("#nTask").value.trim();
+  if(!task){$("#nTask").focus();return}
+  const engs=[...$("#nEng").selectedOptions].map(o=>o.value);
+  const t=now();
+  D.jobs.push({id:uid(),tail:$("#nTail").value,bay:$("#nBay").value.trim(),task,status:engs.length?"work":"open",
+    created:t,started:engs.length?t:null,completed:null,assignments:engs.map(e=>({eng:e,from:t,to:null}))});
+  $("#nTask").value="";$("#nBay").value="";
+  save();
+};
+$("#showDone").onchange=render;$("#sortBy").onchange=render;
+
+function assign(jobId,engId){
+  const j=D.jobs.find(x=>x.id===jobId);if(!j||!engId)return;
+  const t=now();
+  // re-task: release engineer from any other active job
+  D.jobs.filter(active).forEach(o=>o.assignments.forEach(a=>{if(a.eng===engId&&!a.to&&o.id!==jobId)a.to=t}));
+  D.jobs.filter(active).forEach(o=>{if(o.status==="work"&&!current(o).length)o.status="open"});
+  if(!current(j).includes(engId))j.assignments.push({eng:engId,from:t,to:null});
+  if(j.status==="open"){j.status="work";j.started=j.started||t}
+  save();
+}
+function unassign(jobId,engId){
+  const j=D.jobs.find(x=>x.id===jobId);const t=now();
+  j.assignments.forEach(a=>{if(a.eng===engId&&!a.to)a.to=t});
+  if(!current(j).length&&j.status==="work")j.status="open";
+  save();
+}
+function complete(jobId){
+  const j=D.jobs.find(x=>x.id===jobId);const t=now();
+  j.assignments.forEach(a=>{if(!a.to)a.to=t});
+  j.status="done";j.completed=t;save();
+}
+function reopen(jobId){
+  const j=D.jobs.find(x=>x.id===jobId);j.status="open";j.completed=null;save();
+}
+function del(jobId){
+  if(!confirm("Delete this job? It will be removed from the record too."))return;
+  D.jobs=D.jobs.filter(x=>x.id!==jobId);save();
+}
+function editField(jobId,field,val){const j=D.jobs.find(x=>x.id===jobId);j[field]=val;save()}
+
+function renderBoard(){
+  const busy=busyMap();
+  const onShift=D.engineers.filter(e=>e.onShift);
+  $("#nEng").innerHTML=onShift.map(e=>`<option value="${e.id}">${esc(e.name)}${busy[e.id]?" (on "+esc(busy[e.id][0].tail)+")":""}</option>`).join("")||"";
+  const sod=new Date();sod.setHours(sod.getHours()<6?-18:0,0,0,0);
+  let jobs=D.jobs.filter(j=>active(j)||($("#showDone").checked&&new Date(j.completed)>=sod));
+  const s=$("#sortBy").value;
+  jobs.sort((a,b)=>(a.status==="done")-(b.status==="done")||(s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail)));
+  $("#jobs").innerHTML=jobs.map(j=>{
+    const cur=current(j);
+    const free=onShift.filter(e=>!cur.includes(e.id));
+    const done=j.status==="done";
+    const chips=done
+      ?[...new Set(j.assignments.map(a=>a.eng))].map(e=>`<span class="chip" style="padding-right:10px">${esc(engName(e))}</span>`).join("")
+      :cur.map(e=>`<span class="chip">${esc(engName(e))}<button data-un="${j.id}|${e}" title="Take off job">×</button></span>`).join("");
+    const st=done?`<span class="status s-done">Complete</span><div class="sub">${fmt(j.completed)}</div>`
+      :j.status==="work"?`<span class="status s-work">In work</span><div class="sub">since ${fmt(j.started)}</div>`
+      :`<span class="status s-open">Unmanned</span>`;
+    return `<tr class="${done?"done":""}">
+      <td><select data-f="tail" data-id="${j.id}" class="tail ${j.tail==="Off Aircraft"?"off":""}" ${done?"disabled":""} style="width:auto;border:0;padding:2px;font-weight:800">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select></td>
+      <td><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} style="width:80px;padding:4px 6px"></td>
+      <td class="task-text">${esc(j.task)}</td>
+      <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${busy[e.id]?" – re-task from "+esc(busy[e.id][0].tail):""}</option>`).join("")}</select></div>`}</td>
+      <td>${st}</td>
+      <td style="white-space:nowrap">${done?`<button class="btn sm" data-reopen="${j.id}">Reopen</button>`:`<button class="btn ok sm" data-done="${j.id}">Complete</button>`} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
+    </tr>`}).join("")||`<tr><td colspan="6" class="empty">No open jobs. Add one above.</td></tr>`;
+
+  const freeE=onShift.filter(e=>!busy[e.id]);
+  const busyE=onShift.filter(e=>busy[e.id]);
+  $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;
+  $("#freeList").innerHTML=freeE.map(e=>`<div class="p free">${esc(e.name)}</div>`).join("")||`<div class="sub">${onShift.length?"Everyone is tasked":"Nobody marked on shift – see Shift list"}</div>`;
+  $("#busyList").innerHTML=busyE.map(e=>{const j=busy[e.id][0];return `<div class="p busy">${esc(e.name)}<small>${esc(j.tail)}${j.bay?" · Bay "+esc(j.bay):""}<br>${esc(j.task.split("\n")[0].slice(0,28))}</small></div>`}).join("")||`<div class="sub">Nobody tasked</div>`;
+}
+$("#jobs").addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.un){const[j,en]=t.dataset.un.split("|");unassign(j,en)}
+  else if(t.dataset.done)complete(t.dataset.done);
+  else if(t.dataset.reopen)reopen(t.dataset.reopen);
+  else if(t.dataset.del)del(t.dataset.del);
+});
+$("#jobs").addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.add)assign(t.dataset.add,t.value);
+  else if(t.dataset.f)editField(t.dataset.id,t.dataset.f,t.value.trim());
+});
+
+/* ---------- shift ---------- */
+$("#addEngs").onclick=()=>{
+  const names=$("#engPaste").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+  names.forEach(n=>{if(!D.engineers.some(e=>e.name.toLowerCase()===n.toLowerCase()))D.engineers.push({id:uid(),name:n,onShift:true})});
+  $("#engPaste").value="";save();
+};
+$("#allOn").onclick=()=>{D.engineers.forEach(e=>e.onShift=true);save()};
+$("#allOff").onclick=()=>{if(confirm("Mark everyone off shift? Anyone still on a job is taken off it.")){const ts=now();D.engineers.forEach(e=>e.onShift=false);D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(!a.to)a.to=ts});if(j.status==="work")j.status="open"});save()}};
+function renderShift(){
+  const cnt={};D.jobs.filter(j=>j.status==="done").forEach(j=>new Set(j.assignments.map(a=>a.eng)).forEach(e=>cnt[e]=(cnt[e]||0)+1));
+  const list=[...D.engineers].sort((a,b)=>a.name.localeCompare(b.name));
+  $("#engs").innerHTML=list.map(e=>`<tr>
+    <td><input data-name="${e.id}" value="${esc(e.name)}" style="padding:4px 8px"></td>
+    <td><label class="switch"><input type="checkbox" data-on="${e.id}" ${e.onShift?"checked":""}> ${e.onShift?"On":"Off"}</label></td>
+    <td>${cnt[e.id]||0}</td>
+    <td><button class="btn warn sm" data-rm="${e.id}">Remove</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Add your shift list on the right.</td></tr>`;
+}
+$("#engs").addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.on){const en=eng(t.dataset.on);en.onShift=t.checked;
+    if(!t.checked){const ts=now();D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(a.eng===en.id&&!a.to)a.to=ts});if(j.status==="work"&&!current(j).length)j.status="open"})}
+    save()}
+  else if(t.dataset.name){const v=t.value.trim();if(v){eng(t.dataset.name).name=v;save()}}
+});
+$("#engs").addEventListener("click",e=>{
+  const id=e.target.dataset.rm;if(!id)return;
+  if(!confirm("Remove "+engName(id)+" from the shift list? Their past jobs stay in the record."))return;
+  const en=eng(id);en.removed=true;en.onShift=false;
+  const ts=now();D.jobs.filter(active).forEach(j=>j.assignments.forEach(a=>{if(a.eng===id&&!a.to)a.to=ts}));
+  D.engineers=D.engineers.filter(x=>x.id!==id);
+  (D.archived=D.archived||[]).push(en);save();
+});
+const allNames=()=>[...D.engineers,...(D.archived||[])];
+const nameOf=id=>allNames().find(e=>e.id===id)?.name||"(unknown)";
+
+$("#exportJson").onclick=()=>download(`work-allocation-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(D,null,1),"application/json");
+$("#importJson").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!Array.isArray(d.jobs))throw 0;
+    if(confirm("Replace everything on this device with the backup?")){D=d;save()}}catch(_){alert("That file isn't a Work Allocation backup.")}
+  e.target.value="";
+};
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+/* ---------- history ---------- */
+["#fEng","#fTail","#fFrom","#fTo","#fText"].forEach(s=>$(s).addEventListener("input",renderHistory));
+function histRows(){
+  const fe=$("#fEng").value,ft=$("#fTail").value,ff=$("#fFrom").value,fto=$("#fTo").value,fx=$("#fText").value.toLowerCase();
+  return D.jobs.filter(j=>j.status==="done").filter(j=>{
+    const who=j.assignments.map(a=>a.eng);
+    if(fe&&!who.includes(fe))return false;
+    if(ft&&j.tail!==ft)return false;
+    const d=j.completed.slice(0,10);
+    if(ff&&d<ff)return false;if(fto&&d>fto)return false;
+    if(fx&&!(j.task+" "+j.bay).toLowerCase().includes(fx))return false;
+    return true;
+  }).sort((a,b)=>b.completed.localeCompare(a.completed));
+}
+function whoDid(j){
+  const m={};j.assignments.forEach(a=>{m[a.eng]=(m[a.eng]||0)+((new Date(a.to||j.completed))-new Date(a.from))});
+  return Object.entries(m).map(([e,ms])=>({name:nameOf(e),mins:Math.round(ms/60000)}));
+}
+function renderHistory(){
+  const fe=$("#fEng").value,ft=$("#fTail").value;
+  $("#fEng").innerHTML=`<option value="">All engineers</option>`+allNames().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<option value="${e.id}" ${e.id===fe?"selected":""}>${esc(e.name)}${e.removed?" (removed)":""}</option>`).join("");
+  $("#fTail").innerHTML=`<option value="">All tails</option>`+TAILS.map(t=>`<option ${t===ft?"selected":""}>${t}</option>`).join("");
+  const rows=histRows();
+  const tails=new Set(rows.map(r=>r.tail)).size;
+  $("#stats").innerHTML=`<div class="stat"><b>${rows.length}</b>jobs complete</div><div class="stat"><b>${tails}</b>tails worked</div>`;
+  $("#hist").innerHTML=rows.map(j=>`<tr>
+    <td style="white-space:nowrap">${fmt(j.completed)}</td><td class="tail ${j.tail==="Off Aircraft"?"off":""}">${esc(j.tail)}</td><td>${esc(j.bay)}</td>
+    <td class="task-text">${esc(j.task)}</td>
+    <td>${whoDid(j).map(w=>`<span class="chip" style="padding-right:10px">${esc(w.name)} <span class="sub">${w.mins<60?w.mins+"m":Math.floor(w.mins/60)+"h"+String(w.mins%60).padStart(2,"0")}</span></span>`).join("")}</td>
+    <td class="sub" style="white-space:nowrap">${fmt(j.created)}</td><td>${dur(j.started||j.created,j.completed)}</td></tr>`).join("")||`<tr><td colspan="7" class="empty">No completed jobs match.</td></tr>`;
+}
+$("#exportCsv").onclick=()=>{
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const lines=[["Completed","Tail","Bay","Task","Engineers","Raised","Started","Duration"].join(",")];
+  histRows().forEach(j=>lines.push([fmt(j.completed),j.tail,j.bay,j.task,whoDid(j).map(w=>w.name).join("; "),fmt(j.created),fmt(j.started),dur(j.started||j.created,j.completed)].map(q).join(",")));
+  download(`work-record-${new Date().toISOString().slice(0,10)}.csv`,lines.join("\n"),"text/csv");
+};
+
+/* ---------- render ---------- */
+function render(){renderBoard();
+  if(!$("#tab-shift").classList.contains("hide"))renderShift();
+  if(!$("#tab-history").classList.contains("hide"))renderHistory();}
+window.addEventListener("storage",e=>{if(e.key===KEY){try{D=JSON.parse(e.newValue)}catch(_){}render()}});
+render();
+})();
+</script>
+</body>
+</html>
