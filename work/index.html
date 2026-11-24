@@ -170,6 +170,16 @@ tr:last-child td{border-bottom:0}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
 .count{float:right}
 /* trades & roster */
+.tradestrip{display:flex;gap:10px;margin:-4px 0 16px;flex-wrap:wrap}
+.tradestrip:empty{display:none}
+.tcell{all:unset;cursor:pointer;flex:1 1 140px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:10px;box-shadow:var(--sh);padding:9px 12px;display:flex;align-items:center;gap:10px}
+.tcell:hover{border-color:var(--line2);border-left-color:var(--tc)}
+.tcell.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 22%,transparent)}
+.tcell b{font-size:22px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tcell .tn{font-size:12px;font-weight:800;color:var(--tc);text-transform:uppercase;letter-spacing:.4px;line-height:1.2}
+.tcell .tf{font-size:11.5px;color:var(--mute);font-weight:600}
+.tcell .tf i{font-style:normal;color:var(--green);font-weight:800}
+.tlabel{align-self:center;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);padding-right:2px;width:100%}
 .engbar{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .engbar select{width:auto;min-width:210px;font-weight:600}
 .selcount{margin-left:auto;font-size:12.5px;color:var(--ink2)}
@@ -279,6 +289,7 @@ th.today,td.today{background:#FFFBEB}
     <button class="kpi" data-k="done" style="--c:var(--green)"><span class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b id="kpDone">0</b><span>Done this shift</span></div></button>
     <button class="kpi" data-k="team" style="--c:#0EA5E9"><span class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><div><b id="kpTeam">0/0</b><span>Free / on shift</span></div></button>
   </div>
+  <div class="tradestrip" id="tradeStrip"></div>
   <div class="grid">
     <div class="stack">
       <div class="card">
@@ -288,7 +299,7 @@ th.today,td.today{background:#FFFBEB}
           <div><label class="f" for="nBay">Bay</label><input id="nBay" placeholder="e.g. 3"></div>
           <div class="engf"><label class="f">Engineers</label>
             <div class="engbar"><select id="nTrade"></select><label class="switch"><input type="checkbox" id="nBusy"> Include busy</label><span class="selcount" id="nSelCount"></span></div>
-            <div id="nEng" class="picker"></div></div></div>
+            <div id="nEng" class="picker"></div></div>
           <div class="tasks">
             <div><label class="f" for="nTask">Task(s) – one per line</label><textarea id="nTask" rows="2" placeholder="e.g. No.2 engine oil replen&#10;Fwd door seal inspection"></textarea></div>
             <button class="btn pri big" id="addJob"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add job</button>
@@ -481,6 +492,7 @@ $("#nBay").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.ctrlKey&&!e.met
 $("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(!b)return;PICK.has(b.dataset.id)?PICK.delete(b.dataset.id):PICK.add(b.dataset.id);renderPicker()});
 $("#nTrade").onchange=()=>{try{localStorage.setItem("wa-pick-trade",$("#nTrade").value)}catch(e){}renderPicker()};
 $("#nBusy").onchange=renderPicker;
+$("#tradeStrip").addEventListener("click",e=>{const c=e.target.closest(".tcell");if(!c)return;const v=$("#nTrade").value===c.dataset.t?"":c.dataset.t;$("#nTrade").value=v;$("#nTrade").dispatchEvent(new Event("change"));render();$("#nTrade").scrollIntoView({behavior:"smooth",block:"center"})});
 let FILTER="active";
 $("#sortBy").onchange=render;$("#q").addEventListener("input",render);
 const setFilter=f=>{FILTER=f;document.querySelectorAll("#pills button").forEach(b=>b.classList.toggle("on",b.dataset.f===f));render()};
@@ -573,6 +585,8 @@ function renderBoard(){
   const n={work:act.filter(j=>j.status==="work").length,planned:act.filter(j=>j.status==="planned").length,open:act.filter(j=>j.status==="open").length,done:doneShift.length};
   const freeE=onShift.filter(e=>!w[e.id]),busyE=onShift.filter(e=>w[e.id]),offE=D.engineers.filter(e=>!e.onShift).sort(byTrade);
   $("#kpWork").textContent=n.work;$("#kpPlan").textContent=n.planned;$("#kpOpen").textContent=n.open;$("#kpDone").textContent=n.done;$("#kpTeam").textContent=freeE.length+"/"+onShift.length;
+  const tg=groupByTrade(onShift),selT=$("#nTrade").value;
+  $("#tradeStrip").innerHTML=onShift.some(e=>e.cat)?`<div class="tlabel">On shift today by trade</div>`+tg.map((l,i)=>`<button class="tcell t${i} ${selT===String(i)?"on":""}" data-t="${i}" title="Show ${TRADES[i]} in the engineer picker"><b>${l.length}</b><div><div class="tn">${TRADES[i].replace(" / other","")}</div><div class="tf"><i>${l.filter(e=>!w[e.id]).length}</i> free</div></div></button>`).join(""):"";
   $("#pcActive").textContent=act.length;$("#pcWork").textContent=n.work;$("#pcPlan").textContent=n.planned;$("#pcOpen").textContent=n.open;$("#pcDone").textContent=n.done;
   document.querySelectorAll(".kpi").forEach(k=>k.classList.toggle("on",k.dataset.k===FILTER));
   // jobs list
