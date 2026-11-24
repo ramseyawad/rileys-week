@@ -574,7 +574,7 @@ function renderBoard(){
   // team
   $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;$("#cOff").textContent=offE.length;
   $("#teamSub").textContent=onShift.length+" on shift";
-  const fp=e=>`<div class="person" style="padding:5px 8px">${av(e.id)}<div><div class="nm">${esc(e.name)}</div>${p[e.id]?`<div class="ds">Next: <b>${p[e.id].map(label).join(", ")}</b></div>`:`""}</div></div>`;
+  const fp=e=>`<div class="person" style="padding:5px 8px">${av(e.id)}<div><div class="nm">${esc(e.name)}</div>${p[e.id]?`<div class="ds">Next: <b>${p[e.id].map(label).join(", ")}</b></div>`:""}</div></div>`;
   $("#freeList").innerHTML=(freeE.some(e=>e.cat)?groupByTrade(freeE).map((g,i)=>g.length?`<div class="tgh">${TRADES[i]} · ${g.length}</div>`+g.map(fp).join(""):"").join(""):freeE.map(fp).join(""))||`<div class="team-empty">${onShift.length?"Everyone is working":"Nobody marked on shift"}</div>`;
   $("#busyList").innerHTML=[...busyE].sort(byTrade).map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)} ${tradeTag(e)}</div><div class="ds">${w[e.id].map(j=>`<b>${label(j)}</b> · ${esc(j.task.split("\n")[0].slice(0,30))}`).join("<br>")}${p[e.id]?`<br>Next: ${p[e.id].map(label).join(", ")}`:""}</div></div></div>`).join("")||`<div class="team-empty">Nobody on a started job</div>`;
   $("#offList").innerHTML=offE.map(e=>`<div class="person off">${av(e.id)}<div class="nm">${esc(e.name)}</div></div>`).join("")||`<div class="team-empty">–</div>`;
