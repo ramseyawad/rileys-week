@@ -169,6 +169,24 @@ tr:last-child td{border-bottom:0}
 .namein{padding:5px 8px;border-color:transparent;font-weight:600;max-width:320px}.namein:hover{border-color:var(--line2)}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
 .count{float:right}
+/* trades & roster */
+.pgrp{display:flex;flex-wrap:wrap;gap:6px;width:100%;align-items:center}
+.pgrp+.pgrp{margin-top:4px}
+.pgrp>b{width:100%;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);margin-top:4px}
+.trade{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;border-radius:5px;padding:1px 6px;background:color-mix(in srgb,var(--tc) 13%,#fff);color:var(--tc);white-space:nowrap;vertical-align:1px}
+.t0{--tc:#475569}.t1{--tc:#0E7490}.t2{--tc:#0F766E}.t3{--tc:#C2410C}.t4{--tc:#B45309}.t5{--tc:#7C3AED}
+.tgh{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);padding:6px 8px 2px}
+tr.grp td{background:#F6F8FB;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink2);padding:8px 12px}
+tr.grp td span{color:var(--mute);font-weight:700;margin-left:6px}
+.code{display:inline-block;min-width:38px;text-align:center;font-size:11.5px;font-weight:800;border-radius:6px;padding:3px 6px;background:#EEF2F7;color:#475569;position:relative}
+.code.L{background:#DBEAFE;color:#1E40AF}.code.N{background:#EDE9FE;color:#5B21B6}.code.H{background:#F1F5F9;color:#94A3B8}
+.code.LCL{background:#2563EB;color:#fff}.code.LWL{background:#4F46E5;color:#fff}.code.E{background:#FEF08A;color:#854D0E}.code.SL{background:#BAE6FD;color:#075985}
+.code.mk:after{content:"✓";position:absolute;top:-6px;right:-6px;font-size:10px;background:#fff;color:var(--blue);border:1px solid #BFD3F8;border-radius:50%;width:14px;height:14px;line-height:12px}
+th.today,td.today{background:#FFFBEB}
+#engs td{vertical-align:middle;padding-top:7px;padding-bottom:7px}
+.rosterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:#FAFBFD}
+.rosterbar select{width:auto}
+.rosterbar .lbl{font-size:12px;font-weight:700;color:var(--mute)}
 /* toast */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:11px 14px 11px 16px;border-radius:10px;font-weight:600;z-index:60;display:flex;align-items:center;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:all .2s}
 #toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
@@ -216,6 +234,7 @@ tr:last-child td{border-bottom:0}
 .side .lane{flex:1}
 .lane.free{--c:#22C55E}.lane.free h3 i{background:#22C55E}
 .pp{display:flex;justify-content:space-between;align-items:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#BBF7D0;border-radius:.6vw;padding:.45vw .8vw;font-weight:700;font-size:1.15vw;margin-bottom:.45vw}
+.pp .ptr{font-size:.72vw;color:#86EFAC;opacity:.75;font-weight:700;margin-left:.3vw}
 .pp small{font-size:.8vw;color:#A78BFA;font-weight:700}
 .lane.donel{--c:#64748B}.lane.donel h3 i{background:#64748B}
 .dl{display:flex;justify-content:space-between;font-size:.95vw;color:#94A3B8;padding:.35vw 0;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -293,28 +312,50 @@ tr:last-child td{border-bottom:0}
 
 <!-- SHIFT -->
 <section id="tab-shift" class="hide">
-  <div class="grid" style="grid-template-columns:minmax(0,1fr) 340px">
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) 320px">
     <div class="card">
-      <div class="card-h"><h2>Shift list</h2><span class="sub" style="margin-left:auto">Toggle who's on today – names can be edited in place</span></div>
-      <div class="toolbar">
-        <button class="btn" id="allOn">All on shift</button>
-        <button class="btn" id="allOff">Clear shift (new shift)</button>
+      <div class="card-h"><h2>Shift list &amp; roster</h2><span class="sub" style="margin-left:auto" id="rosterWeek"></span></div>
+      <div class="rosterbar">
+        <span class="lbl">Put on shift from roster:</span>
+        <select id="rDay"></select>
+        <select id="rShift">
+          <option value="L,LCL,LWL">Lates (L, LCL, LWL)</option>
+          <option value="N">Nights (N)</option>
+          <option value="E">Earlys (E)</option>
+        </select>
+        <button class="btn pri sm" id="rApply">Apply</button>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn sm" id="allOn">All on</button>
+          <button class="btn sm" id="allOff">Clear shift</button>
+        </span>
       </div>
+      <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Name</th><th>On shift</th><th>Jobs done</th><th></th></tr></thead>
+        <thead id="engHead"></thead>
         <tbody id="engs"></tbody>
       </table>
+      </div>
     </div>
-    <div class="card pad">
-      <h2 style="padding-bottom:4px">Add engineers</h2>
-      <p class="sub" style="margin-top:0">One per line, e.g. <i>Cpl Smith</i>. You can paste a whole list.</p>
-      <textarea id="engPaste" rows="8"></textarea>
-      <button class="btn pri" id="addEngs" style="margin-top:8px;width:100%">Add to list</button>
-      <h2 style="padding:22px 0 4px">Backup</h2>
-      <p class="sub">Records are saved on this device. Export a backup now and then.</p>
-      <div style="display:flex;gap:8px">
-        <button class="btn" id="exportJson">Export backup</button>
-        <label class="btn">Import backup<input type="file" id="importJson" accept=".json" hidden></label>
+    <div class="stack">
+      <div class="card pad">
+        <h2 style="padding-bottom:4px">Import roster</h2>
+        <p class="sub" style="margin-top:0">Load a roster file (.json). Names, trades and shift codes are added or updated, and today's lates are put on shift. Kept on this device only.</p>
+        <label class="btn pri" style="width:100%">Choose roster file<input type="file" id="importRoster" accept=".json" hidden></label>
+      </div>
+      <div class="card pad">
+        <h2 style="padding-bottom:4px">Add engineers</h2>
+        <p class="sub" style="margin-top:0">One per line, e.g. <i>Cpl Smith</i>.</p>
+        <textarea id="engPaste" rows="4"></textarea>
+        <select id="engTrade" style="margin-top:8px"></select>
+        <button class="btn pri" id="addEngs" style="margin-top:8px;width:100%">Add to list</button>
+      </div>
+      <div class="card pad">
+        <h2 style="padding-bottom:4px">Backup</h2>
+        <p class="sub" style="margin-top:0">Records are saved on this device. Export a backup now and then.</p>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="exportJson">Export backup</button>
+          <label class="btn">Import backup<input type="file" id="importJson" accept=".json" hidden></label>
+        </div>
       </div>
     </div>
   </div>
@@ -390,6 +431,19 @@ const current=j=>j.assignments.filter(a=>!a.to).map(a=>a.eng);
 // jobs each engineer is on, split by started (in work) vs not started
 const jobMaps=()=>{const w={},p={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>{const m=j.status==="work"?w:p;(m[e]=m[e]||[]).push(j)}));return{w,p}};
 const label=j=>esc(j.tail)+(j.bay?" B"+esc(j.bay):"");
+const TRADES=["B1 / B2 Certs","A Cat Mech","A+ Mech","A+ Av","A Cat Av","Management / other"];
+const TRADE_CAT=["B1 Cert","A Cat Mech","A Plus Mech","A Plus Av","A Cat Av",""];
+function tradeIx(e){const c=String(e?.cat||"").toLowerCase();
+  if(/\bb[12]\b/.test(c))return 0;if(/(plus|\+)\s*mech/.test(c))return 2;if(/cat\s*mech/.test(c))return 1;
+  if(/(plus|\+)\s*av/.test(c))return 3;if(/cat\s*av/.test(c))return 4;return 5}
+const catShort=e=>String(e?.cat||"").replace(/\s*Cert\b/i,"").replace(/A Plus/i,"A+").trim();
+const tradeTag=e=>e?.cat?`<span class="trade t${tradeIx(e)}">${esc(catShort(e))}</span>`:"";
+const surname=n=>n.trim().split(/\s+/).pop().toLowerCase();
+const byTrade=(a,b)=>tradeIx(a)-tradeIx(b)||surname(a.name).localeCompare(surname(b.name));
+function groupByTrade(list){const g=TRADES.map(()=>[]);[...list].sort(byTrade).forEach(e=>g[tradeIx(e)].push(e));return g}
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const dayLbl=ds=>new Date(ds+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+function setOnShift(en,on){en.onShift=on;if(!on){const ts=now();D.jobs.filter(active).forEach(j=>{j.assignments=j.assignments.filter(a=>!(a.eng===en.id&&!a.to&&!a.from));j.assignments.forEach(a=>{if(a.eng===en.id&&!a.to)a.to=ts});if(j.status!=="work"&&j.status!=="done")j.status=current(j).length?"planned":"open"})}}
 
 /* ---------- tabs & clock ---------- */
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{window.scrollTo(0,0);
@@ -465,24 +519,26 @@ function del(jobId){
 function editField(jobId,field,val){const j=job(jobId);if(field==="task"&&!val){render();return}if(j[field]!==val){j[field]=val;j.edited=now()}save()}
 
 const AVC=["#2563EB","#7C3AED","#DB2777","#EA580C","#0891B2","#16A34A","#CA8A04","#4F46E5","#0D9488","#9333EA"];
-function initials(n){const w=n.replace(/^(AS1|AS2|SAC|LAC|Cpl|Sgt|FS|CT|Chf\s*Tech|Mr|Mrs|Ms)\.?\s+/i,"").trim().split(/\s+/);return((w[0]||"?")[0]+(w[1]?w[1][0]:(w[0]||"")[1]||"")).toUpperCase()}
+function initials(n){const w=n.replace(/^(AS1\(T\)|AS2|AS1|SAC\(T\)|SAC|LAC|Cpl|Sgt|FS|Flt\s*Lt|Fg\s*Off|Sqn\s*Ldr|CT|Chf\s*Tech|Mr|Mrs|Ms|Miss)\.?\s+/i,"").trim().split(/\s+/);return((w[0]||"?")[0]+(w[1]?w[1][0]:(w[0]||"")[1]||"")).toUpperCase()}
 function av(id){const n=engName(id);let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;return `<span class="av" style="background:${AVC[h%AVC.length]}">${esc(initials(n))}</span>`}
 const IC={play:`<svg class="i" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,check:`<svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,pause:`<svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,send:`<svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>`,trash:`<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`,undo:`<svg class="i" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>`,x:`<svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>`,clock:`<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`};
 const ago=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 function renderBoard(){
   const {w,p}=jobMaps();
-  const onShift=D.engineers.filter(e=>e.onShift).sort((a,b)=>a.name.localeCompare(b.name));
+  const onShift=D.engineers.filter(e=>e.onShift).sort(byTrade);
   const where=id=>[...(w[id]||[]).map(j=>"on "+label(j)),...(p[id]||[]).map(j=>"next "+label(j))].join(", ");
   // picker
   const keep=new Set([...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id));
-  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}" data-id="${e.id}">${av(e.id)}${esc(e.name)}${w[e.id]?`<em>${label(w[e.id][0])}</em>`:""}</button>`).join("")||`<span class="sub">Nobody on shift yet – add your team in <a href="#" id="goShift">Shift list</a></span>`;
+  const pb=e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}" data-id="${e.id}">${av(e.id)}${esc(e.name)}${w[e.id]?`<em>${label(w[e.id][0])}</em>`:""}</button>`;
+  const anyCat=onShift.some(e=>e.cat);
+  $("#nEng").innerHTML=(anyCat?groupByTrade(onShift).map((g,i)=>g.length?`<div class="pgrp"><b>${TRADES[i]}</b>${g.map(pb).join("")}</div>`:"").join(""):onShift.map(pb).join(""))||`<span class="sub">Nobody on shift yet – add your team in <a href="#" id="goShift">Shift list</a></span>`;
   $("#goShift")?.addEventListener("click",e=>{e.preventDefault();document.querySelector('nav button[data-tab=shift]').click()});
   // counts
   const ss=shiftStart();
   const act=D.jobs.filter(active);
   const doneShift=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=ss);
   const n={work:act.filter(j=>j.status==="work").length,planned:act.filter(j=>j.status==="planned").length,open:act.filter(j=>j.status==="open").length,done:doneShift.length};
-  const freeE=onShift.filter(e=>!w[e.id]),busyE=onShift.filter(e=>w[e.id]),offE=D.engineers.filter(e=>!e.onShift).sort((a,b)=>a.name.localeCompare(b.name));
+  const freeE=onShift.filter(e=>!w[e.id]),busyE=onShift.filter(e=>w[e.id]),offE=D.engineers.filter(e=>!e.onShift).sort(byTrade);
   $("#kpWork").textContent=n.work;$("#kpPlan").textContent=n.planned;$("#kpOpen").textContent=n.open;$("#kpDone").textContent=n.done;$("#kpTeam").textContent=freeE.length+"/"+onShift.length;
   $("#pcActive").textContent=act.length;$("#pcWork").textContent=n.work;$("#pcPlan").textContent=n.planned;$("#pcOpen").textContent=n.open;$("#pcDone").textContent=n.done;
   document.querySelectorAll(".kpi").forEach(k=>k.classList.toggle("on",k.dataset.k===FILTER));
@@ -518,8 +574,9 @@ function renderBoard(){
   // team
   $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;$("#cOff").textContent=offE.length;
   $("#teamSub").textContent=onShift.length+" on shift";
-  $("#freeList").innerHTML=freeE.map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)}</div>${p[e.id]?`<div class="ds">Next: <b>${p[e.id].map(label).join(", ")}</b></div>`:`<div class="ds">Free to task</div>`}</div></div>`).join("")||`<div class="team-empty">${onShift.length?"Everyone is working":"Nobody marked on shift"}</div>`;
-  $("#busyList").innerHTML=busyE.map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)}</div><div class="ds">${w[e.id].map(j=>`<b>${label(j)}</b> · ${esc(j.task.split("\n")[0].slice(0,30))}`).join("<br>")}${p[e.id]?`<br>Next: ${p[e.id].map(label).join(", ")}`:""}</div></div></div>`).join("")||`<div class="team-empty">Nobody on a started job</div>`;
+  const fp=e=>`<div class="person" style="padding:5px 8px">${av(e.id)}<div><div class="nm">${esc(e.name)}</div>${p[e.id]?`<div class="ds">Next: <b>${p[e.id].map(label).join(", ")}</b></div>`:`""}</div></div>`;
+  $("#freeList").innerHTML=(freeE.some(e=>e.cat)?groupByTrade(freeE).map((g,i)=>g.length?`<div class="tgh">${TRADES[i]} · ${g.length}</div>`+g.map(fp).join(""):"").join(""):freeE.map(fp).join(""))||`<div class="team-empty">${onShift.length?"Everyone is working":"Nobody marked on shift"}</div>`;
+  $("#busyList").innerHTML=[...busyE].sort(byTrade).map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)} ${tradeTag(e)}</div><div class="ds">${w[e.id].map(j=>`<b>${label(j)}</b> · ${esc(j.task.split("\n")[0].slice(0,30))}`).join("<br>")}${p[e.id]?`<br>Next: ${p[e.id].map(label).join(", ")}`:""}</div></div></div>`).join("")||`<div class="team-empty">Nobody on a started job</div>`;
   $("#offList").innerHTML=offE.map(e=>`<div class="person off">${av(e.id)}<div class="nm">${esc(e.name)}</div></div>`).join("")||`<div class="team-empty">–</div>`;
 }
 $("#jobs").addEventListener("click",e=>{
@@ -572,34 +629,66 @@ function toast(m,undo){let t=$("#toast");if(!t){t=document.createElement("div");
 $("#shareAll").onclick=()=>share(boardText());
 
 /* ---------- shift ---------- */
+$("#engTrade").innerHTML=`<option value="">Trade (optional)</option>`+TRADE_CAT.slice(0,5).map((c,i)=>`<option value="${c}">${TRADES[i]==="B1 / B2 Certs"?"B1 Cert":TRADES[i]}</option>`).join("")+`<option value="B2 Cert (A)">B2 Cert</option>`;
 $("#addEngs").onclick=()=>{
-  const names=$("#engPaste").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
-  names.forEach(n=>{if(!D.engineers.some(e=>e.name.toLowerCase()===n.toLowerCase()))D.engineers.push({id:uid(),name:n,onShift:true})});
-  $("#engPaste").value="";save();
+  const names=$("#engPaste").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean),cat=$("#engTrade").value;
+  names.forEach(n=>{if(!D.engineers.some(e=>e.name.toLowerCase()===n.toLowerCase()))D.engineers.push({id:uid(),name:n,cat,onShift:true})});
+  $("#engPaste").value="";save();toast(names.length+" added");
 };
 $("#allOn").onclick=()=>{D.engineers.forEach(e=>e.onShift=true);save()};
-$("#allOff").onclick=()=>{if(confirm("Mark everyone off shift? Anyone still on a job is taken off it.")){const ts=now();D.engineers.forEach(e=>e.onShift=false);D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(!a.to)a.to=ts});if(j.status!=="done")j.status="open"});save()}};
+$("#allOff").onclick=()=>{if(confirm("Mark everyone off shift? Anyone still on a job is taken off it.")){D.engineers.forEach(e=>setOnShift(e,false));save()}};
+const rosterDays=()=>[...new Set(D.engineers.flatMap(e=>Object.keys(e.roster||{})))].sort().slice(-7);
+function applyRoster(day,codes){
+  let n=0;D.engineers.forEach(e=>{const c=(e.roster||{})[day];const on=!!c&&codes.includes(c);if(e.onShift!==on)setOnShift(e,on);if(on)n++});
+  save();return n;
+}
+$("#rApply").onclick=()=>{const day=$("#rDay").value;if(!day){toast("Import a roster first");return}
+  const n=applyRoster(day,$("#rShift").value.split(","));toast(n+" on shift for "+dayLbl(day)+" – "+$("#rShift").selectedOptions[0].text.split(" (")[0])};
+$("#importRoster").onchange=async ev=>{
+  const f=ev.target.files[0];ev.target.value="";if(!f)return;
+  let r;try{r=JSON.parse(await f.text());if(r.type!=="wa-roster"||!Array.isArray(r.people))throw 0}catch(_){toast("That isn't a roster file");return}
+  const key=n=>n.toLowerCase().replace(/^(as1\(t\)|as2|as1|sac\(t\)|sac|lac|cpl|sgt|fs|flt\s*lt|fg\s*off|sqn\s*ldr|ct|chf\s*tech|mr|mrs|ms|miss)\.?\s+/,"").replace(/\s+/g," ").trim();
+  let added=0,updated=0;
+  r.people.forEach(pp=>{
+    const full=(pp.title?pp.title+" ":"")+pp.name;
+    let e=D.engineers.find(x=>key(x.name)===key(pp.name));
+    if(!e){e={id:uid(),name:full,onShift:false};D.engineers.push(e);added++}else updated++;
+    e.name=full;e.title=pp.title||"";e.cat=pp.cat||e.cat||"";
+    e.roster=Object.assign(e.roster||{},pp.roster||{});
+    e.marked=[...new Set([...(e.marked||[]),...(pp.marked||[])])];
+  });
+  D.rosterWeek=r.week||"";
+  const today=iso(new Date()),days=rosterDays();
+  const n=days.includes(today)?applyRoster(today,["L","LCL","LWL"]):(save(),0);
+  toast(`${added} added, ${updated} updated${days.includes(today)?` · ${n} on shift today (lates)`:""}`);
+};
 function renderShift(){
   const cnt={};D.jobs.filter(j=>j.status==="done").forEach(j=>new Set(j.assignments.filter(a=>a.from).map(a=>a.eng)).forEach(e=>cnt[e]=(cnt[e]||0)+1));
-  const list=[...D.engineers].sort((a,b)=>a.name.localeCompare(b.name));
-  $("#engs").innerHTML=list.map(e=>`<tr>
+  const days=rosterDays(),today=iso(new Date());
+  const keepDay=$("#rDay").value;
+  $("#rDay").innerHTML=days.map(d=>`<option value="${d}" ${(keepDay?d===keepDay:d===today)?"selected":""}>${dayLbl(d)}${d===today?" (today)":""}</option>`).join("")||`<option value="">No roster loaded</option>`;
+  $("#rosterWeek").textContent=D.rosterWeek?"Roster "+D.rosterWeek:"";
+  $("#engHead").innerHTML=`<tr><th>Name</th><th>Trade</th>${days.map(d=>`<th class="${d===today?"today":""}" style="text-align:center">${dayLbl(d).replace(/ \w+$/,"")}</th>`).join("")}<th>On shift</th><th>Jobs</th><th></th></tr>`;
+  const cols=5+days.length;
+  const row=e=>`<tr>
     <td><div style="display:flex;align-items:center;gap:10px">${av(e.id)}<input data-name="${e.id}" value="${esc(e.name)}" class="namein"></div></td>
-    <td><label class="switch"><input type="checkbox" data-on="${e.id}" ${e.onShift?"checked":""}> ${e.onShift?"On":"Off"}</label></td>
+    <td>${tradeTag(e)||'<span class="sub">–</span>'}</td>
+    ${days.map(d=>{const c=(e.roster||{})[d];return `<td class="${d===today?"today":""}" style="text-align:center">${c?`<span class="code ${esc(c)} ${(e.marked||[]).includes(d)?"mk":""}" title="${(e.marked||[]).includes(d)?"Marked on the printed roster":""}">${esc(c)}</span>`:""}</td>`}).join("")}
+    <td><label class="switch"><input type="checkbox" data-on="${e.id}" ${e.onShift?"checked":""}></label></td>
     <td>${cnt[e.id]||0}</td>
-    <td><button class="btn warn sm" data-rm="${e.id}">Remove</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Add your shift list on the right.</td></tr>`;
+    <td style="text-align:right"><button class="btn warn sm" data-rm="${e.id}">Remove</button></td></tr>`;
+  const g=groupByTrade(D.engineers);
+  $("#engs").innerHTML=g.map((list,i)=>list.length?`<tr class="grp"><td colspan="${cols}">${TRADES[i]}<span>${list.filter(e=>e.onShift).length} of ${list.length} on shift</span></td></tr>`+list.map(row).join(""):"").join("")||`<tr><td colspan="${cols}" class="empty"><b>No engineers yet</b>Import a roster file or add names on the right.</td></tr>`;
 }
 $("#engs").addEventListener("change",e=>{
   const t=e.target;
-  if(t.dataset.on){const en=eng(t.dataset.on);en.onShift=t.checked;
-    if(!t.checked){const ts=now();D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(a.eng===en.id&&!a.to)a.to=ts});if(!current(j).length)j.status="open"})}
-    save()}
+  if(t.dataset.on){setOnShift(eng(t.dataset.on),t.checked);save()}
   else if(t.dataset.name){const v=t.value.trim();if(v){eng(t.dataset.name).name=v;save()}}
 });
 $("#engs").addEventListener("click",e=>{
-  const id=e.target.dataset.rm;if(!id)return;
+  const id=e.target.closest("[data-rm]")?.dataset.rm;if(!id)return;
   if(!confirm("Remove "+engName(id)+" from the shift list? Their past jobs stay in the record."))return;
-  const en=eng(id);en.removed=true;en.onShift=false;
-  const ts=now();D.jobs.filter(active).forEach(j=>j.assignments.forEach(a=>{if(a.eng===id&&!a.to)a.to=ts}));
+  const en=eng(id);setOnShift(en,false);en.removed=true;
   D.engineers=D.engineers.filter(x=>x.id!==id);
   (D.archived=D.archived||[]).push(en);save();
 });
@@ -706,7 +795,7 @@ function renderDisplay(){
   const free=D.engineers.filter(e=>e.onShift&&!w[e.id]).sort((a,b)=>!!p[a.id]-!!p[b.id]||a.name.localeCompare(b.name));
   [["kWork",work],["nWork",work],["kNext",next],["nNext",next],["kOpen",open],["nOpen",open],["kDone",done],["nDone",done],["nFree",free]].forEach(([id,l])=>$("#"+id).textContent=l.length);
   fill("#lWork",work,"Nothing in work");fill("#lNext",next,"Nothing lined up");fill("#lOpen",open,"All jobs manned");
-  fillHtml("#lFree",free.map(e=>`<div class="pp">${esc(e.name)}${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`);
+  fillHtml("#lFree",[...free].sort((a,b)=>!!p[a.id]-!!p[b.id]||byTrade(a,b)).map(e=>`<div class="pp"><span>${esc(e.name)}${e.cat?` <span class="ptr">${esc(catShort(e))}</span>`:""}</span>${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`);
   fillHtml("#lDone",done.map(j=>`<div class="dl"><span><b>${esc(j.tail==="Off Aircraft"?"Off A/C":j.tail)}</b> ${esc(j.task.split("\n")[0].slice(0,22))}</span><span>${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")||`<div class="empty-lane">None yet</div>`);
 }
 function openDisplay(){$("#display").classList.remove("hide");document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");if(location.hash!=="#display")history.replaceState(null,"","#display");
