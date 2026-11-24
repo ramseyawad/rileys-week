@@ -236,6 +236,7 @@ th.today,td.today{background:#FFFBEB}
 /* ---------- DISPLAY BOARD ---------- */
 #display{position:fixed;inset:0;z-index:50;background:#070B14;color:#E2E8F0;display:flex;flex-direction:column;padding:1.6vw 1.8vw;gap:1.4vw;font-size:1vw;overflow:hidden;font-family:Inter,system-ui,"Segoe UI",sans-serif}
 #display.hide{display:none}
+#display:not(.hide)~#toast{display:none}
 .db-top{display:flex;align-items:center;gap:2vw}
 .db-title{font-size:2.2vw;font-weight:900;letter-spacing:.15vw;text-transform:uppercase;color:#fff;line-height:1}
 .db-title small{display:block;font-size:.85vw;letter-spacing:.35vw;color:#64748B;font-weight:700;margin-top:.4vw}
@@ -247,9 +248,19 @@ th.today,td.today{background:#FFFBEB}
 .db-clock{text-align:right;margin-left:2vw}
 .db-clock b{display:block;font-size:3.2vw;line-height:1;font-weight:900;font-variant-numeric:tabular-nums;color:#fff}
 .db-clock span{font-size:1vw;color:#94A3B8;font-weight:600}
-#dbGrid{flex:1;min-height:0;overflow:hidden;position:relative;padding:1vw .6vw 0}
+.db-body{flex:1;min-height:0;display:grid;grid-template-columns:1fr 19vw;gap:1.6vw}
+.db-busy{display:flex;flex-direction:column;min-height:0;background:rgba(255,255,255,.03);border:1px solid rgba(245,158,11,.25);border-radius:1vw;padding:1vw}
+.db-busy h3{margin:0 0 .8vw;font-size:1.1vw;letter-spacing:.2vw;text-transform:uppercase;display:flex;align-items:center;gap:.6vw;color:#FCD34D}
+.db-busy h3 i{width:.8vw;height:.8vw;border-radius:50%;background:#F59E0B;box-shadow:0 0 .8vw #F59E0B}
+.db-busy h3 em{margin-left:auto;font-style:normal;background:rgba(255,255,255,.08);color:#fff;border-radius:99px;padding:0 .7vw;font-size:1vw}
+#dbBusy{flex:1;min-height:0;overflow:hidden}
+.bz{display:flex;flex-direction:column;gap:.15vw;padding:.55vw .2vw;border-bottom:1px solid rgba(255,255,255,.06)}
+.bz .n{font-size:1.15vw;font-weight:700;color:#fff}
+.bz .n em{font-style:normal;font-size:.75vw;color:#94A3B8;margin-left:.3vw}
+.bz .w{font-size:.95vw;font-weight:800;color:#FCD34D}
+#dbGrid{min-height:0;overflow:hidden;position:relative;padding:1vw .6vw 0}
 #dbGrid.scrolling{-webkit-mask-image:linear-gradient(transparent 0,#000 1.5vw,#000 calc(100% - 3vw),transparent 100%);mask-image:linear-gradient(transparent 0,#000 1.5vw,#000 calc(100% - 3vw),transparent 100%)}
-#dbGrid .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(21vw,1fr));gap:1.6vw;padding-bottom:1.6vw;align-items:start}
+#dbGrid .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(19vw,1fr));gap:1.6vw;padding-bottom:1.6vw;align-items:start}
 .jc{--g:#EF4444;background:linear-gradient(180deg,#101828,#0C1322);border:.12vw solid color-mix(in srgb,var(--g) 70%,transparent);border-radius:1vw;padding:1.1vw 1.3vw 1.2vw;box-shadow:0 0 1.4vw color-mix(in srgb,var(--g) 45%,transparent),inset 0 0 1.2vw color-mix(in srgb,var(--g) 10%,transparent)}
 .jc.amber{--g:#F59E0B;animation:glow 2.4s ease-in-out infinite}
 .jc.red{animation:glow 1.6s ease-in-out infinite}
@@ -426,13 +437,16 @@ th.today,td.today{background:#FFFBEB}
   <div class="db-top">
     <div class="db-title">Line Tasking<small>LIVE JOBS</small></div>
     <div class="db-legend">
-      <span class="lg red"><i></i><b id="kOpen">0</b> Not working</span>
+      <span class="lg red"><i></i><b id="kOpen">0</b> Not started</span>
       <span class="lg amber"><i></i><b id="kWork">0</b> In progress</span>
       <span class="lg green"><i></i><b id="kDone">0</b> Complete</span>
     </div>
     <div class="db-clock"><b id="dTime"></b><span id="dDate"></span></div>
   </div>
-  <div class="cards" id="dbGrid"></div>
+  <div class="db-body">
+    <div class="cards" id="dbGrid"></div>
+    <div class="db-busy"><h3><i></i>Busy<em id="nBusyW">0</em></h3><div class="cards" id="dbBusy"></div></div>
+  </div>
 </div>
 <script>
 (()=>{
@@ -876,10 +890,14 @@ function renderDisplay(){
   $("#dDate").textContent=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   const byTail=(a,b)=>TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail);
   const act=D.jobs.filter(active);
-  const work=act.filter(j=>j.status==="work").sort(byTail),idle=act.filter(j=>j.status!=="work").sort(byTail);
+  const work=act.filter(j=>j.status==="work").sort(byTail),idle=act.filter(j=>j.status==="planned").sort(byTail); // unmanned jobs are not shown on the wall board
   const done=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=shiftStart()).sort((a,b)=>b.completed.localeCompare(a.completed));
   $("#kOpen").textContent=idle.length;$("#kWork").textContent=work.length;$("#kDone").textContent=done.length;
-  fillHtml("#dbGrid",[...idle,...work,...done].map(card).join("")||`<div class="empty-lane">No jobs raised this shift</div>`);
+  const {w}=jobMaps();
+  const busy=D.engineers.filter(e=>w[e.id]).sort(byTrade);
+  $("#nBusyW").textContent=busy.length;
+  fillHtml("#dbBusy",busy.map(e=>`<div class="bz"><span class="n">${esc(e.name)}${e.cat?`<em>${esc(catShort(e))}</em>`:""}</span><span class="w">On ${w[e.id].map(label).join(", ")}</span></div>`).join("")||`<div class="empty-lane" style="font-size:1.1vw;padding:3vw 0">Nobody on a job</div>`);
+  fillHtml("#dbGrid",[...idle,...work,...done].map(card).join("")||`<div class="empty-lane">No jobs assigned yet</div>`);
 }
 function openDisplay(){$("#display").classList.remove("hide");document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");if(location.hash!=="#display")history.replaceState(null,"","#display");
   document.documentElement.requestFullscreen?.().catch(()=>{});renderDisplay()}
