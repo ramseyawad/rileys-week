@@ -60,6 +60,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .p small{font-weight:500;font-size:12px;text-align:right}
 .count{float:right;background:var(--ink);color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
 .task-text{white-space:pre-wrap}
+.task-edit{border:1px solid transparent;background:transparent;padding:4px 6px;min-height:0;resize:none;overflow:hidden;line-height:1.4;min-width:180px}
+.task-edit:hover{border-color:#CBD5E1;background:#F8FAFC}
+.task-edit:focus{border-color:var(--blue);background:#fff;outline:none;box-shadow:0 0 0 3px #DBEAFE}
 .inline-add select{width:auto;padding:3px 6px;font-size:13px}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .filters>*{width:auto;flex:1 1 140px}
@@ -341,7 +344,7 @@ function del(jobId){
   if(!confirm("Delete this job? It will be removed from the record too."))return;
   D.jobs=D.jobs.filter(x=>x.id!==jobId);save();
 }
-function editField(jobId,field,val){job(jobId)[field]=val;save()}
+function editField(jobId,field,val){const j=job(jobId);if(field==="task"&&!val){render();return}if(j[field]!==val){j[field]=val;j.edited=now()}save()}
 
 function renderBoard(){
   const {w,p}=jobMaps();
@@ -370,7 +373,7 @@ function renderBoard(){
     return `<tr class="${done?"done":""} row-${j.status}">
       <td><select data-f="tail" data-id="${j.id}" class="tail ${j.tail==="Off Aircraft"?"off":""}" ${done?"disabled":""} style="width:auto;border:0;padding:2px;font-weight:800">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select></td>
       <td><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} style="width:80px;padding:4px 6px"></td>
-      <td class="task-text">${esc(j.task)}</td>
+      <td>${done?`<div class="task-text">${esc(j.task)}</div>`:`<textarea class="task-edit" data-f="task" data-id="${j.id}" rows="${Math.max(1,j.task.split("\n").length)}" title="Click to amend">${esc(j.task)}</textarea>`}</td>
       <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" ("+where(e.id)+")":""}</option>`).join("")}</select></div>`}</td>
       <td>${st}</td>
       <td style="white-space:nowrap">${btns} ${done?"":`<button class="btn sm" data-share="${j.id}" title="Send this job as a text">📤</button>`} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
@@ -392,6 +395,8 @@ $("#jobs").addEventListener("click",e=>{
   else if(t.dataset.reopen)reopen(t.dataset.reopen);
   else if(t.dataset.del)del(t.dataset.del);
 });
+$("#jobs").addEventListener("input",e=>{const t=e.target;if(t.classList.contains("task-edit")){t.rows=Math.max(1,t.value.split("\n").length)}});
+$("#jobs").addEventListener("keydown",e=>{const t=e.target;if(t.classList.contains("task-edit")&&(e.key==="Escape"||(e.key==="Enter"&&(e.ctrlKey||e.metaKey))))t.blur()});
 $("#jobs").addEventListener("change",e=>{
   const t=e.target;
   if(t.dataset.add)assign(t.dataset.add,t.value);
