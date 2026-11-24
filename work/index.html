@@ -201,7 +201,7 @@ tr:last-child td{border-bottom:0}
 .pgrp+.pgrp{margin-top:4px}
 .pgrp>b{width:100%;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);margin-top:4px}
 .trade{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;border-radius:5px;padding:1px 6px;background:color-mix(in srgb,var(--tc) 13%,#fff);color:var(--tc);white-space:nowrap;vertical-align:1px}
-.t0{--tc:#1D4ED8}.t1{--tc:#0369A1}.t2{--tc:#0F766E}.t3{--tc:#15803D}.t4{--tc:#C2410C}.t5{--tc:#B45309}.t6{--tc:#7C3AED}
+.t0{--tc:#7C3AED}.t1{--tc:#1D4ED8}.t2{--tc:#0369A1}.t3{--tc:#15803D}.t4{--tc:#C2410C}.t5{--tc:#0F766E}.t6{--tc:#B45309}
 .tgh{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);padding:6px 8px 2px}
 tr.grp td{background:#F6F8FB;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink2);padding:8px 12px}
 tr.grp td span{color:var(--mute);font-weight:700;margin-left:6px}
@@ -464,11 +464,11 @@ const current=j=>j.assignments.filter(a=>!a.to).map(a=>a.eng);
 // jobs each engineer is on, split by started (in work) vs not started
 const jobMaps=()=>{const w={},p={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>{const m=j.status==="work"?w:p;(m[e]=m[e]||[]).push(j)}));return{w,p}};
 const label=j=>esc(j.tail)+(j.bay?" B"+esc(j.bay):"");
-const TRADES=["B1 Cert","B2 Cert","A Cat Mech","A+ Mech","A+ Av","A Cat Av","Management / other"];
-const TRADE_CAT=["B1 Cert","B2 Cert (A)","A Cat Mech","A Plus Mech","A Plus Av","A Cat Av",""];
+const TRADES=["Management / other","B1 Cert","B2 Cert","A+ Mech","A+ Av","A Cat Mech","A Cat Av"];
+const TRADE_CAT=["Shift Mgmt","B1 Cert","B2 Cert (A)","A Plus Mech","A Plus Av","A Cat Mech","A Cat Av"];
 function tradeIx(e){const c=String(e?.cat||"").toLowerCase();
-  if(/\bb1\b/.test(c))return 0;if(/\bb2\b/.test(c))return 1;if(/(plus|\+)\s*mech/.test(c))return 3;if(/cat\s*mech/.test(c))return 2;
-  if(/(plus|\+)\s*av/.test(c))return 4;if(/cat\s*av/.test(c))return 5;return 6}
+  if(/\bb1\b/.test(c))return 1;if(/\bb2\b/.test(c))return 2;if(/(plus|\+)\s*mech/.test(c))return 3;if(/(plus|\+)\s*av/.test(c))return 4;
+  if(/cat\s*mech/.test(c))return 5;if(/cat\s*av/.test(c))return 6;return 0}
 const catShort=e=>String(e?.cat||"").replace(/\s*Cert\b/i,"").replace(/A Plus/i,"A+").trim();
 const tradeTag=e=>e?.cat?`<span class="trade t${tradeIx(e)}">${esc(catShort(e))}</span>`:"";
 const surname=n=>n.trim().split(/\s+/).pop().toLowerCase();
@@ -502,7 +502,7 @@ $("#addJob").onclick=()=>{
 ["#nTask","#nBay"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("#addJob").click()}}));
 $("#nBay").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.ctrlKey&&!e.metaKey){e.preventDefault();$("#nTask").focus()}});
 $("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(!b)return;PICK.has(b.dataset.id)?PICK.delete(b.dataset.id):PICK.add(b.dataset.id);renderPicker()});
-$("#nTrade").onchange=()=>{try{localStorage.setItem("wa-pick-trade",$("#nTrade").value)}catch(e){}renderPicker()};
+$("#nTrade").onchange=()=>{try{localStorage.setItem("wa-pick-trade2",$("#nTrade").value)}catch(e){}renderPicker()};
 $("#nBusy").onchange=renderPicker;
 $("#tradeStrip").addEventListener("click",e=>{const c=e.target.closest(".tcell");if(!c)return;const v=$("#nTrade").value===c.dataset.t?"":c.dataset.t;$("#nTrade").value=v;$("#nTrade").dispatchEvent(new Event("change"));render();$("#nTrade").scrollIntoView({behavior:"smooth",block:"center"})});
 let FILTER="active";
@@ -565,7 +565,7 @@ function renderPicker(){
   const onShift=D.engineers.filter(e=>e.onShift).sort(byTrade);
   [...PICK].forEach(id=>{if(!eng(id)?.onShift)PICK.delete(id)});
   const busyOK=$("#nBusy").checked;
-  let saved="";try{saved=localStorage.getItem("wa-pick-trade")||""}catch(e){}
+  let saved="";try{saved=localStorage.getItem("wa-pick-trade2")||""}catch(e){}
   const cur=$("#nTrade").options.length?$("#nTrade").value:saved;
   const g=groupByTrade(onShift);
   const avail=list=>list.filter(e=>!w[e.id]).length;
@@ -609,8 +609,8 @@ function renderBoard(){
   jobs=[...jobs].sort((a,b)=>s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]||TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail));
   const emptyMsg={active:["No open jobs","Raise a job above to get started."],work:["Nothing in work","Press Start on a job when the team cracks on."],planned:["Nothing waiting to start",""],open:["No unmanned jobs","Every open job has someone on it."],done:["Nothing completed this shift yet",""]}[FILTER];
   // role rows on each job card: Cert = B1/B2, Mechs = A Cat / A+ trades, Other = management / no trade
-  const ROLES=[["B1",[0],"Cert"],["B2",[1],"Cert"],["Mechs",[2,3,4,5],"A Cat / A+"],["Other",[6],""]];
-  const roleOf=e=>{const t=tradeIx(e);return t<2?t:t===6?3:2};
+  const ROLES=[["B1",[1],"Cert"],["B2",[2],"Cert"],["Mechs",[3,4,5,6],"A+ / A Cat"],["Other",[0],""]];
+  const roleOf=e=>{const t=tradeIx(e);return t===1?0:t===2?1:t===0?3:2};
   $("#jobs").innerHTML=jobs.map(j=>{
     const cur=current(j),done=j.status==="done",off=j.tail==="Off Aircraft";
     const did=done?whoDid(j):[];
@@ -705,7 +705,7 @@ function toast(m,undo){let t=$("#toast");if(!t){t=document.createElement("div");
 $("#shareAll").onclick=()=>share(boardText());
 
 /* ---------- shift ---------- */
-$("#engTrade").innerHTML=`<option value="">Trade (optional)</option>`+TRADE_CAT.slice(0,6).map((c,i)=>`<option value="${c}">${TRADES[i]}</option>`).join("")+`<option value="Shift Mgmt">Management</option>`;
+$("#engTrade").innerHTML=`<option value="">Trade (optional)</option>`+TRADE_CAT.map((c,i)=>`<option value="${c}">${i?TRADES[i]:"Management"}</option>`).join("");
 $("#addEngs").onclick=()=>{
   const names=$("#engPaste").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean),cat=$("#engTrade").value;
   names.forEach(n=>{if(!D.engineers.some(e=>e.name.toLowerCase()===n.toLowerCase()))D.engineers.push({id:uid(),name:n,cat,onShift:true})});
@@ -824,7 +824,7 @@ const shiftStart=()=>{const d=new Date(),h=d.getHours();d.setMinutes(0,0,0);if(h
 const since=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 function card(j){
   const who=current(j).map(eng).filter(Boolean);
-  const b1=who.filter(e=>tradeIx(e)===0),b2=who.filter(e=>tradeIx(e)===1),mech=who.filter(e=>tradeIx(e)>1&&tradeIx(e)<6),oth=who.filter(e=>tradeIx(e)===6);
+  const b1=who.filter(e=>tradeIx(e)===1),b2=who.filter(e=>tradeIx(e)===2),mech=who.filter(e=>tradeIx(e)>2),oth=who.filter(e=>tradeIx(e)===0);
   const tasks=j.task.split("\n").map(t=>t.trim()).filter(Boolean);
   const off=j.tail==="Off Aircraft";
   const line=(l,list,empty)=>`<div class="jc-row"><b>${l}</b><div class="jc-who">${list.length?list.map(e=>`<span>${esc(e.name)}</span>`).join(""):`<span class="none">${empty}</span>`}</div></div>`;
