@@ -33,7 +33,7 @@ nav button.on{background:#fff;color:var(--ink)}
 .hbtn.solid{background:var(--blue);border-color:var(--blue)}
 .hbtn.solid:hover{background:#1D4ED8}
 @media(max-width:1100px){.shiftpill{display:none}}
-@media(max-width:760px){header{height:auto;flex-wrap:wrap;padding:10px 12px;gap:10px}.brand small{display:none}nav{order:3;width:100%;justify-content:space-between}nav button{flex:1;justify-content:center;padding:7px 6px}.hdr-right{gap:8px}.hbtn{padding:7px 9px}.hbtn span.l{display:none}.search{width:100%;margin-left:0}main{padding:12px}}
+@media(max-width:760px){#jobs{grid-template-columns:1fr;padding:10px}header{height:auto;flex-wrap:wrap;padding:10px 12px;gap:10px}.brand small{display:none}nav{order:3;width:100%;justify-content:space-between}nav button{flex:1;justify-content:center;padding:7px 6px}.hdr-right{gap:8px}.hbtn{padding:7px 9px}.hbtn span.l{display:none}.search{width:100%;margin-left:0}main{padding:12px}}
 main{padding:20px;max-width:1600px;margin:0 auto}
 /* generic */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
@@ -98,26 +98,35 @@ textarea{resize:vertical;min-height:42px;line-height:1.45}
 .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mute)}
 .search input{padding-left:32px}
 #sortBy{width:auto}
-/* job rows */
-.job{display:grid;grid-template-columns:118px minmax(0,1fr) minmax(0,1fr) 130px 216px;gap:16px;align-items:start;padding:14px 16px 14px 18px;border-bottom:1px solid var(--line);position:relative;transition:background .15s}
-.job:last-child{border-bottom:0}
-.job:hover{background:#FAFBFD}
-.job:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:var(--c)}
+/* job cards */
+#jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;padding:16px;background:#F8FAFC;border-radius:0 0 var(--r) var(--r)}
+#jobs>.empty{grid-column:1/-1}
+.job{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;box-shadow:var(--sh);display:flex;flex-direction:column;position:relative;transition:box-shadow .15s}
+.job:hover{box-shadow:0 4px 14px rgba(15,23,42,.08)}
 .job.st-work{--c:var(--blue)}.job.st-planned{--c:var(--violet)}.job.st-open{--c:var(--amber)}.job.st-done{--c:#94A3B8}
-.job.st-done{background:#FBFCFD}.job.st-done .tailsel,.job.st-done .task-text{color:var(--mute)}
-@media(max-width:1250px){.job{grid-template-columns:110px 1fr 1fr}.job .stat-col{grid-column:2}.job .acts{grid-column:3;justify-content:flex-start}}
-@media(max-width:700px){.job{grid-template-columns:1fr}.job .stat-col,.job .acts{grid-column:auto}}
-.tailsel{all:unset;font-size:19px;font-weight:800;letter-spacing:.2px;cursor:pointer;border-radius:6px;padding:0 2px}
+.job.st-done{opacity:.85}
+.jh{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px dashed var(--line)}
+.jst{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.jst .sub{display:flex;align-items:center;gap:4px}
+.jr{display:grid;grid-template-columns:72px 1fr;gap:10px;padding:9px 14px;align-items:start}
+.jr+.jr{border-top:1px solid #F1F4F8}
+.jl{font-size:12px;font-weight:800;color:var(--ink2);padding-top:5px}
+.jl small{display:block;font-size:10px;font-weight:700;color:var(--mute);letter-spacing:.2px}
+.jr .none{font-size:12.5px;color:var(--amber);font-weight:600;font-style:italic;padding:3px 0}
+.jtask{min-width:0}
+.jf{margin-top:auto;display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--line);background:#FBFCFD;border-radius:0 0 12px 12px}
+.jf .acts{margin-left:auto}
+.tailsel{all:unset;font-size:22px;font-weight:800;letter-spacing:.2px;cursor:pointer;border-radius:6px;padding:0 2px}
 .tailsel:hover:not(:disabled){background:#EEF2F7}
 .tailsel.off{font-size:14px;color:var(--amber)}
-.bayf{display:flex;align-items:center;gap:6px;margin-top:6px}
+.bayf{display:flex;align-items:center;gap:4px;font-size:18px;color:var(--mute);font-weight:300}
 .bayf span{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--mute)}
-.bayf input{width:58px;padding:3px 7px;font-weight:700;font-size:13px;border-color:transparent;background:#F1F4F8}
+.bayf input{width:52px;padding:3px 7px;font-weight:700;font-size:13px;border-color:transparent;background:#F1F4F8}
 .bayf input:hover{border-color:var(--line2)}
 .bayf input:disabled{background:transparent}
 .colh{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--mute);text-transform:uppercase;margin-bottom:4px}
 .task-text{white-space:pre-wrap;line-height:1.45;padding:4px 0}
-.task-edit{border:1px solid transparent;background:transparent;padding:4px 7px;margin-left:-7px;min-height:0;resize:none;overflow:hidden;line-height:1.45;width:calc(100% + 7px)}
+.task-edit{border:1px solid transparent;background:transparent;padding:4px 7px;margin-left:-7px;min-height:0;resize:none;overflow:hidden;line-height:1.45;width:calc(100% + 7px);font-weight:600}
 .task-edit:hover{border-color:var(--line2);background:#fff}
 .task-edit:focus{border-color:var(--blue);background:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -192,7 +201,7 @@ tr:last-child td{border-bottom:0}
 .pgrp+.pgrp{margin-top:4px}
 .pgrp>b{width:100%;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);margin-top:4px}
 .trade{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.3px;border-radius:5px;padding:1px 6px;background:color-mix(in srgb,var(--tc) 13%,#fff);color:var(--tc);white-space:nowrap;vertical-align:1px}
-.t0{--tc:#475569}.t1{--tc:#0E7490}.t2{--tc:#0F766E}.t3{--tc:#C2410C}.t4{--tc:#B45309}.t5{--tc:#7C3AED}
+.t0{--tc:#1D4ED8}.t1{--tc:#0369A1}.t2{--tc:#0F766E}.t3{--tc:#15803D}.t4{--tc:#C2410C}.t5{--tc:#B45309}.t6{--tc:#7C3AED}
 .tgh{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);padding:6px 8px 2px}
 tr.grp td{background:#F6F8FB;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--ink2);padding:8px 12px}
 tr.grp td span{color:var(--mute);font-weight:700;margin-left:6px}
@@ -241,8 +250,11 @@ th.today,td.today{background:#FFFBEB}
 .jc-tasks li{padding-left:1vw;position:relative}
 .jc-tasks li:before{content:"";position:absolute;left:0;top:.55vw;width:.4vw;height:.4vw;border-radius:50%;background:var(--c)}
 .jc-who{display:flex;flex-wrap:wrap;gap:.4vw}
+.jc-row{display:grid;grid-template-columns:4.6vw 1fr;gap:.6vw;align-items:start;margin-top:.55vw}
+.jc-row>b{font-size:.8vw;letter-spacing:.12vw;color:#64748B;font-weight:800;padding-top:.3vw}
+.jc-row .jc-tasks{margin:0}
 .jc-who span{background:rgba(255,255,255,.08);border-radius:99px;padding:.2vw .8vw;font-size:1.05vw;font-weight:700;color:#fff}
-.jc-who .none{background:transparent;color:#F59E0B;font-style:italic;padding:0}
+.jc-who .none{background:transparent;color:#F59E0B;font-style:italic;padding:.2vw 0;font-size:1vw}
 .jc-time{font-size:.85vw;color:#94A3B8;margin-top:.5vw;font-weight:600}
 .lane.work{--c:#38BDF8}.lane.next{--c:#A78BFA}.lane.open{--c:#F59E0B}
 .lane.work h3 i{background:#38BDF8;box-shadow:0 0 .8vw #38BDF8;animation:pulse 2s infinite}
@@ -252,7 +264,7 @@ th.today,td.today{background:#FFFBEB}
 .side .lane{flex:1}
 .lane.free{--c:#22C55E}.lane.free h3 i{background:#22C55E}
 .pp{display:flex;justify-content:space-between;align-items:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#BBF7D0;border-radius:.6vw;padding:.45vw .8vw;font-weight:700;font-size:1.15vw;margin-bottom:.45vw}
-.pp .ptr{font-size:.72vw;color:#86EFAC;opacity:.75;font-weight:700;margin-left:.3vw}
+.pp .ptr{white-space:nowrap;font-size:.72vw;color:#86EFAC;opacity:.75;font-weight:700;margin-left:.3vw}
 .pp small{font-size:.8vw;color:#A78BFA;font-weight:700}
 .lane.donel{--c:#64748B}.lane.donel h3 i{background:#64748B}
 .dl{display:flex;justify-content:space-between;font-size:.95vw;color:#94A3B8;padding:.35vw 0;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -452,11 +464,11 @@ const current=j=>j.assignments.filter(a=>!a.to).map(a=>a.eng);
 // jobs each engineer is on, split by started (in work) vs not started
 const jobMaps=()=>{const w={},p={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>{const m=j.status==="work"?w:p;(m[e]=m[e]||[]).push(j)}));return{w,p}};
 const label=j=>esc(j.tail)+(j.bay?" B"+esc(j.bay):"");
-const TRADES=["B1 / B2 Certs","A Cat Mech","A+ Mech","A+ Av","A Cat Av","Management / other"];
-const TRADE_CAT=["B1 Cert","A Cat Mech","A Plus Mech","A Plus Av","A Cat Av",""];
+const TRADES=["B1 Cert","B2 Cert","A Cat Mech","A+ Mech","A+ Av","A Cat Av","Management / other"];
+const TRADE_CAT=["B1 Cert","B2 Cert (A)","A Cat Mech","A Plus Mech","A Plus Av","A Cat Av",""];
 function tradeIx(e){const c=String(e?.cat||"").toLowerCase();
-  if(/\bb[12]\b/.test(c))return 0;if(/(plus|\+)\s*mech/.test(c))return 2;if(/cat\s*mech/.test(c))return 1;
-  if(/(plus|\+)\s*av/.test(c))return 3;if(/cat\s*av/.test(c))return 4;return 5}
+  if(/\bb1\b/.test(c))return 0;if(/\bb2\b/.test(c))return 1;if(/(plus|\+)\s*mech/.test(c))return 3;if(/cat\s*mech/.test(c))return 2;
+  if(/(plus|\+)\s*av/.test(c))return 4;if(/cat\s*av/.test(c))return 5;return 6}
 const catShort=e=>String(e?.cat||"").replace(/\s*Cert\b/i,"").replace(/A Plus/i,"A+").trim();
 const tradeTag=e=>e?.cat?`<span class="trade t${tradeIx(e)}">${esc(catShort(e))}</span>`:"";
 const surname=n=>n.trim().split(/\s+/).pop().toLowerCase();
@@ -596,27 +608,44 @@ function renderBoard(){
   const s=$("#sortBy").value, rank={work:0,planned:1,open:2,done:3};
   jobs=[...jobs].sort((a,b)=>s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]||TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail));
   const emptyMsg={active:["No open jobs","Raise a job above to get started."],work:["Nothing in work","Press Start on a job when the team cracks on."],planned:["Nothing waiting to start",""],open:["No unmanned jobs","Every open job has someone on it."],done:["Nothing completed this shift yet",""]}[FILTER];
+  // role rows on each job card: Cert = B1/B2, Mechs = A Cat / A+ trades, Other = management / no trade
+  const ROLES=[["B1",[0],"Cert"],["B2",[1],"Cert"],["Mechs",[2,3,4,5],"A Cat / A+"],["Other",[6],""]];
+  const roleOf=e=>{const t=tradeIx(e);return t<2?t:t===6?3:2};
   $("#jobs").innerHTML=jobs.map(j=>{
     const cur=current(j),done=j.status==="done",off=j.tail==="Off Aircraft";
-    const free=onShift.filter(e=>!cur.includes(e.id));
-    const chips=done
-      ?whoDid(j).map(x=>`<span class="chip plain">${av(x.id)}${esc(x.name)} <small>${x.mins<60?x.mins+"m":Math.floor(x.mins/60)+"h"+String(x.mins%60).padStart(2,"0")}</small></span>`).join("")
-      :cur.map(e=>{const other=(w[e]||[]).filter(o=>o.id!==j.id);return `<span class="chip">${av(e)}${esc(engName(e))}${other.length?` <small>on ${label(other[0])}</small>`:""}<button data-un="${j.id}|${e}" title="Take ${esc(engName(e))} off this job">${IC.x}</button></span>`}).join("");
-    const addSel=done?"":`<select class="addeng" data-add="${j.id}"><option value="">${cur.length?"Add":"Assign"}</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" – "+where(e.id):""}</option>`).join("")}</select>`;
-    const st=done?`<span class="status">Complete</span><div class="sub">${IC.check} ${fmt(j.completed)}</div>`
-      :j.status==="work"?`<span class="status">In work</span><div class="sub">${IC.clock} ${ago(j.started)}</div>`
-      :j.status==="planned"?`<span class="status">Not started</span><div class="sub">Raised ${fmt(j.created)}</div>`
-      :`<span class="status">Unmanned</span><div class="sub">Raised ${fmt(j.created)}</div>`;
+    const did=done?whoDid(j):[];
+    const people=done?did.map(x=>x.id):cur;
+    const chip=e=>{
+      if(done){const x=did.find(d=>d.id===e);return `<span class="chip plain">${av(e)}${esc(engName(e))} <small>${x.mins<60?x.mins+"m":Math.floor(x.mins/60)+"h"+String(x.mins%60).padStart(2,"0")}</small></span>`}
+      const other=(w[e]||[]).filter(o=>o.id!==j.id);
+      return `<span class="chip">${av(e)}${esc(engName(e))}${other.length?` <small>on ${label(other[0])}</small>`:""}<button data-un="${j.id}|${e}" title="Take ${esc(engName(e))} off this job">${IC.x}</button></span>`};
+    const addFor=ri=>{
+      const pool=onShift.filter(e=>!cur.includes(e.id)&&ROLES[ri][1].includes(tradeIx(e)));
+      if(done||!pool.length)return "";
+      const opts=ri===2?groupByTrade(pool).map((g,i)=>g.length?`<optgroup label="${TRADES[i]}">${g.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" – "+where(e.id):""}</option>`).join("")}</optgroup>`:"").join("")
+        :pool.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" – "+where(e.id):""}</option>`).join("");
+      return `<select class="addeng" data-add="${j.id}"><option value="">Add</option>${opts}</select>`};
+    const rows=ROLES.map((r,ri)=>{
+      const list=people.filter(e=>roleOf(eng(e)||(D.archived||[]).find(x=>x.id===e))===ri);
+      if(ri===3&&!list.length)return "";
+      const add=addFor(ri);
+      return `<div class="jr"><div class="jl">${r[0]}<small>${r[2]}</small></div><div class="chips">${list.map(chip).join("")||(done?'<span class="sub">–</span>':`<span class="none">${["No B1","No B2","No mechs"][ri]}</span>`)}${add}</div></div>`}).join("");
+    const st=done?`<span class="status">Complete</span><span class="sub">${fmt(j.completed)}</span>`
+      :j.status==="work"?`<span class="status">In work</span><span class="sub">${IC.clock} ${ago(j.started)}</span>`
+      :j.status==="planned"?`<span class="status">Not started</span>`
+      :`<span class="status">Unmanned</span>`;
     const acts=done?`<button class="btn sm" data-reopen="${j.id}">${IC.undo}Reopen</button>`
       :j.status==="work"?`<button class="btn ok sm" data-done="${j.id}">${IC.check}Complete</button><button class="btn icon" data-stop="${j.id}" title="Stop – back to not started">${IC.pause}</button>`
       :`<button class="btn pri sm" data-start="${j.id}" ${cur.length?"":"disabled title='Assign an engineer first'"}>${IC.play}Start</button><button class="btn icon" data-done="${j.id}" title="Mark complete">${IC.check}</button>`;
     return `<div class="job st-${j.status}">
-      <div><select data-f="tail" data-id="${j.id}" class="tailsel ${off?"off":""}" ${done?"disabled":""} title="Change aircraft">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select>
-        <div class="bayf"><span>BAY</span><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} placeholder="–"></div></div>
-      <div><div class="colh">Task</div>${done?`<div class="task-text">${esc(j.task)}</div>`:`<textarea class="task-edit" data-f="task" data-id="${j.id}" rows="${Math.max(1,j.task.split("\n").length)}" title="Click to amend">${esc(j.task)}</textarea>`}</div>
-      <div><div class="colh">Engineers</div><div class="chips">${chips}${addSel}</div></div>
-      <div class="stat-col">${st}</div>
-      <div class="acts">${acts}${done?"":`<button class="btn icon" data-share="${j.id}" title="Send this job as a text">${IC.send}</button>`}<button class="btn icon warn" data-del="${j.id}" title="Delete job">${IC.trash}</button></div>
+      <div class="jh">
+        <select data-f="tail" data-id="${j.id}" class="tailsel ${off?"off":""}" ${done?"disabled":""} title="Change aircraft">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select>
+        <label class="bayf">(<span>BAY</span><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} placeholder="–">)</label>
+        <div class="jst">${st}</div>
+      </div>
+      ${rows}
+      <div class="jr"><div class="jl">Job</div><div class="jtask">${done?`<div class="task-text">${esc(j.task)}</div>`:`<textarea class="task-edit" data-f="task" data-id="${j.id}" rows="${Math.max(1,j.task.split("\n").length)}" title="Click to amend">${esc(j.task)}</textarea>`}</div></div>
+      <div class="jf"><span class="sub">Raised ${fmt(j.created)}</span><div class="acts">${acts}${done?"":`<button class="btn icon" data-share="${j.id}" title="Send this job as a text">${IC.send}</button>`}<button class="btn icon warn" data-del="${j.id}" title="Delete job">${IC.trash}</button></div></div>
     </div>`}).join("")||`<div class="empty"><b>${q?"No jobs match “"+esc(q)+"”":emptyMsg[0]}</b>${q?"":emptyMsg[1]}</div>`;
   // team
   $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;$("#cOff").textContent=offE.length;
@@ -676,7 +705,7 @@ function toast(m,undo){let t=$("#toast");if(!t){t=document.createElement("div");
 $("#shareAll").onclick=()=>share(boardText());
 
 /* ---------- shift ---------- */
-$("#engTrade").innerHTML=`<option value="">Trade (optional)</option>`+TRADE_CAT.slice(0,5).map((c,i)=>`<option value="${c}">${TRADES[i]==="B1 / B2 Certs"?"B1 Cert":TRADES[i]}</option>`).join("")+`<option value="B2 Cert (A)">B2 Cert</option>`;
+$("#engTrade").innerHTML=`<option value="">Trade (optional)</option>`+TRADE_CAT.slice(0,6).map((c,i)=>`<option value="${c}">${TRADES[i]}</option>`).join("")+`<option value="Shift Mgmt">Management</option>`;
 $("#addEngs").onclick=()=>{
   const names=$("#engPaste").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean),cat=$("#engTrade").value;
   names.forEach(n=>{if(!D.engineers.some(e=>e.name.toLowerCase()===n.toLowerCase()))D.engineers.push({id:uid(),name:n,cat,onShift:true})});
@@ -794,12 +823,14 @@ $("#exportCsv").onclick=()=>{
 const shiftStart=()=>{const d=new Date(),h=d.getHours();d.setMinutes(0,0,0);if(h>=6&&h<18)d.setHours(6);else{if(h<6)d.setDate(d.getDate()-1);d.setHours(18)}return d};
 const since=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 function card(j){
-  const who=current(j).map(engName);
+  const who=current(j).map(eng).filter(Boolean);
+  const b1=who.filter(e=>tradeIx(e)===0),b2=who.filter(e=>tradeIx(e)===1),mech=who.filter(e=>tradeIx(e)>1&&tradeIx(e)<6),oth=who.filter(e=>tradeIx(e)===6);
   const tasks=j.task.split("\n").map(t=>t.trim()).filter(Boolean);
   const off=j.tail==="Off Aircraft";
+  const line=(l,list,empty)=>`<div class="jc-row"><b>${l}</b><div class="jc-who">${list.length?list.map(e=>`<span>${esc(e.name)}</span>`).join(""):`<span class="none">${empty}</span>`}</div></div>`;
   return `<div class="jc"><div class="jc-top"><span class="jc-tail ${off?"off":""}">${esc(off?"OFF AIRCRAFT":j.tail)}</span>${j.bay?`<span class="jc-bay">BAY ${esc(j.bay)}</span>`:""}</div>
-    <ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
-    <div class="jc-who">${who.length?who.map(n=>`<span>${esc(n)}</span>`).join(""):`<span class="none">Awaiting engineers</span>`}</div>
+    ${line("B1",b1,"No B1")}${line("B2",b2,"No B2")}${line("MECHS",mech,"No mechs")}${oth.length?line("OTHER",oth,""):""}
+    <div class="jc-row"><b>JOB</b><ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
     ${j.status==="work"?`<div class="jc-time">⏱ <span class="since" data-t="${j.started}"></span> in work</div>`:""}</div>`;
 }
 // Each lane scrolls smoothly in a loop when its content is taller than the lane.
