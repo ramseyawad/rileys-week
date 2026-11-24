@@ -7,75 +7,172 @@
 <meta name="theme-color" content="#0F172A">
 <title>Work Allocation</title>
 <style>
-:root{--bg:#F1F5F9;--card:#fff;--ink:#0F172A;--mute:#64748B;--line:#E2E8F0;--blue:#1D4ED8;--green:#15803D;--greenbg:#DCFCE7;--amber:#B45309;--amberbg:#FEF3C7;--red:#B91C1C;--redbg:#FEE2E2;--grey:#94A3B8}
+:root{--bg:#F3F5F9;--card:#fff;--ink:#0B1220;--ink2:#334155;--mute:#64748B;--line:#E5E9F0;--line2:#D5DCE6;
+--navy:#0B1220;--navy2:#131D30;--blue:#2563EB;--blueBg:#EFF5FF;--green:#16A34A;--greenBg:#ECFDF3;--amber:#D97706;--amberBg:#FFF7E8;
+--violet:#7C3AED;--violetBg:#F4F0FF;--red:#DC2626;--redBg:#FEF2F2;--r:12px;--sh:0 1px 2px rgba(15,23,42,.05),0 1px 3px rgba(15,23,42,.06)}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-header{background:var(--ink);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
-header h1{font-size:18px;margin:0;letter-spacing:.3px}
-header .clock{font-variant-numeric:tabular-nums;color:#CBD5E1}
-nav{display:flex;gap:4px}
-nav button{background:transparent;color:#CBD5E1;border:0;padding:8px 14px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer}
-nav button.on{background:#1E293B;color:#fff}
-main{padding:16px;max-width:1500px;margin:0 auto}
-.grid{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
-@media(max-width:1000px){.grid{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute)}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--mute);padding:8px;border-bottom:2px solid var(--line);white-space:nowrap}
-td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
-tr.done td{opacity:.55}
-select,input,textarea{font:inherit;padding:8px 10px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:var(--ink);width:100%}
-textarea{resize:vertical;min-height:40px}
-button.btn{font:inherit;font-weight:600;padding:8px 12px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;cursor:pointer;white-space:nowrap}
-button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
-button.ok{background:var(--green);border-color:var(--green);color:#fff}
-button.warn{color:var(--red);border-color:#FCA5A5}
-button.sm{padding:4px 8px;font-size:13px}
-.picker{display:flex;flex-wrap:wrap;gap:6px;border:1px solid #CBD5E1;border-radius:8px;padding:6px;min-height:40px;background:#fff}
-.pick{font:inherit;font-size:13px;font-weight:600;border:1px solid #CBD5E1;background:#F8FAFC;color:var(--ink);border-radius:999px;padding:5px 10px;cursor:pointer}
-.pick.sel{background:var(--blue);border-color:var(--blue);color:#fff}
-.pick.isbusy:not(.sel){color:var(--mute)}
-.addrow{display:grid;grid-template-columns:150px 110px 1fr 280px auto;gap:8px;align-items:start;margin-bottom:14px}
-@media(max-width:800px){.addrow{grid-template-columns:1fr 1fr}.addrow .task,.addrow .engs{grid-column:1/-1}}
-.tail{font-weight:800;font-size:16px;white-space:nowrap}
-.tail.off{color:var(--amber)}
-.chip{display:inline-flex;align-items:center;gap:4px;background:#E0E7FF;color:#1E3A8A;border-radius:999px;padding:3px 4px 3px 10px;margin:2px 4px 2px 0;font-weight:600;font-size:13px}
-.chip button{border:0;background:#C7D2FE;color:#1E3A8A;border-radius:999px;width:20px;height:20px;cursor:pointer;line-height:1;font-size:13px}
-.chip.past{background:#F1F5F9;color:var(--mute);text-decoration:line-through;padding-right:10px}
-.status{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px;white-space:nowrap}
-.s-open{background:var(--amberbg);color:var(--amber)}
-.s-work{background:#DBEAFE;color:var(--blue)}
-.s-plan{background:#EDE9FE;color:#6D28D9}
-tr.row-planned td:first-child{box-shadow:inset 4px 0 #8B5CF6}
-tr.row-work td:first-child{box-shadow:inset 4px 0 var(--blue)}
-tr.row-open td:first-child{box-shadow:inset 4px 0 #F59E0B}
-button:disabled{opacity:.45;cursor:not-allowed}
-.s-done{background:var(--greenbg);color:var(--green)}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* app bar */
+header{background:linear-gradient(90deg,var(--navy),#14233C);color:#fff;height:60px;padding:0 20px;display:flex;align-items:center;gap:22px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#38BDF8,#2563EB);display:grid;place-items:center;box-shadow:0 0 0 1px rgba(255,255,255,.15) inset}
+.logo svg{width:20px;height:20px;stroke:#fff}
+.brand h1{font-size:16px;margin:0;letter-spacing:.2px;line-height:1.1}
+.brand small{display:block;font-size:11px;color:#94A3B8;font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+nav{display:flex;gap:2px;background:rgba(255,255,255,.06);padding:4px;border-radius:10px}
+nav button{display:flex;align-items:center;gap:7px;background:transparent;color:#B6C2D4;border:0;padding:7px 14px;border-radius:7px;font:inherit;font-weight:600;cursor:pointer}
+nav button:hover{color:#fff}
+nav button.on{background:#fff;color:var(--ink)}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.shiftpill{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#CBD5E1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:6px 10px;border-radius:999px}
+.shiftpill i{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 8px #22C55E}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;color:#fff;min-width:48px;text-align:right}
+.hbtn{display:flex;align-items:center;gap:7px;font:inherit;font-weight:600;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:7px 12px;border-radius:8px;cursor:pointer}
+.hbtn:hover{background:rgba(255,255,255,.14)}
+.hbtn.solid{background:var(--blue);border-color:var(--blue)}
+.hbtn.solid:hover{background:#1D4ED8}
+@media(max-width:1100px){.shiftpill{display:none}}
+@media(max-width:760px){header{height:auto;flex-wrap:wrap;padding:10px 12px;gap:10px}.brand small{display:none}nav{order:3;width:100%;justify-content:space-between}nav button{flex:1;justify-content:center;padding:7px 6px}.hdr-right{gap:8px}.hbtn{padding:7px 9px}.hbtn span.l{display:none}.search{width:100%;margin-left:0}main{padding:12px}}
+main{padding:20px;max-width:1600px;margin:0 auto}
+/* generic */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.card-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.card-h h2{font-size:14px;margin:0;font-weight:700}
+.card-b{padding:16px}
+.card>h2{font-size:14px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line)}
+.card.pad{padding:16px}.card.pad>h2{padding:0 0 12px;border:0}
+label.f{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+select,input,textarea{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line2);border-radius:8px;background:#fff;color:var(--ink);width:100%;transition:border-color .15s,box-shadow .15s}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+textarea{resize:vertical;min-height:42px;line-height:1.45}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;font-size:13px;padding:8px 13px;border-radius:8px;border:1px solid var(--line2);background:#fff;color:var(--ink2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s}
+.btn:hover{background:#F8FAFC;border-color:#C3CCD9}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}.btn.pri:hover{background:#1D4ED8}
+.btn.ok{background:var(--green);border-color:var(--green);color:#fff}.btn.ok:hover{background:#15803D}
+.btn.warn{color:var(--red)}.btn.warn:hover{background:var(--redBg);border-color:#FCA5A5}
+.btn.sm{padding:6px 10px;font-size:12.5px}
+.btn.icon{padding:7px;width:32px;height:32px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.big{padding:11px 18px;font-size:14px}
 .sub{color:var(--mute);font-size:12px}
-.people .p{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;margin-bottom:5px;font-weight:600}
-.p.free{background:var(--greenbg);color:var(--green)}
-.p.busy{background:#EFF6FF;color:var(--blue)}
-.p.off{background:#F8FAFC;color:var(--grey);font-weight:500}
-.p small{font-weight:500;font-size:12px;text-align:right}
-.count{float:right;background:var(--ink);color:#fff;border-radius:999px;padding:0 8px;font-size:12px}
-.task-text{white-space:pre-wrap}
-.task-edit{border:1px solid transparent;background:transparent;padding:4px 6px;min-height:0;resize:none;overflow:hidden;line-height:1.4;min-width:180px}
-.task-edit:hover{border-color:#CBD5E1;background:#F8FAFC}
-.task-edit:focus{border-color:var(--blue);background:#fff;outline:none;box-shadow:0 0 0 3px #DBEAFE}
-.inline-add select{width:auto;padding:3px 6px;font-size:13px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.filters>*{width:auto;flex:1 1 140px}
-.empty{color:var(--mute);text-align:center;padding:24px}
-.tbl-wrap{overflow-x:auto}
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.stat{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
-.stat b{display:block;font-size:20px}
-.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
-.switch input{width:20px;height:20px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .hide{display:none!important}
-
+.empty{color:var(--mute);text-align:center;padding:36px 16px}
+.empty b{display:block;color:var(--ink2);font-size:15px;margin-bottom:4px}
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi{all:unset;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:12px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,transform .15s}
+.kpi:hover{border-color:var(--line2);transform:translateY(-1px)}
+.kpi.on{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent)}
+.kpi .dot{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}
+.kpi .dot svg{width:19px;height:19px}
+.kpi b{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--mute);font-weight:600}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}}
+.stack{display:flex;flex-direction:column;gap:16px}
+/* new job */
+.newjob{display:grid;grid-template-columns:170px 110px 1fr;gap:14px}
+.newjob .tasks{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+@media(max-width:800px){.newjob{grid-template-columns:1fr 1fr}.newjob .engf{grid-column:1/-1}.newjob .tasks{grid-template-columns:1fr}}
+.picker{display:flex;flex-wrap:wrap;gap:6px;min-height:42px;align-items:center}
+.pick{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line2);background:#fff;color:var(--ink2);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .12s}
+.pick:hover{border-color:var(--blue)}
+.pick .av{width:22px;height:22px;font-size:10px}
+.pick.sel{background:var(--blue);border-color:var(--blue);color:#fff}
+.pick.sel .av{background:rgba(255,255,255,.25);color:#fff}
+.pick em{font-style:normal;font-size:11px;font-weight:600;color:var(--blue);background:var(--blueBg);border-radius:999px;padding:1px 6px}
+.pick.sel em{background:rgba(255,255,255,.2);color:#fff}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex:none;letter-spacing:.3px}
+/* toolbar */
+.jobs-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.jobs-h h2{font-size:14px;margin:0 6px 0 0}
+.pills{display:flex;gap:4px;background:#F1F4F8;padding:3px;border-radius:9px;flex-wrap:wrap}
+.pills button{font:inherit;font-size:12.5px;font-weight:600;border:0;background:transparent;color:var(--mute);padding:6px 11px;border-radius:7px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.pills button.on{background:#fff;color:var(--ink);box-shadow:var(--sh)}
+.pills button i{font-style:normal;font-size:11px;background:#E2E8F0;color:var(--ink2);border-radius:999px;padding:0 6px;min-width:18px;text-align:center}
+.pills button.on i{background:var(--ink);color:#fff}
+.search{position:relative;margin-left:auto;width:220px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mute)}
+.search input{padding-left:32px}
+#sortBy{width:auto}
+/* job rows */
+.job{display:grid;grid-template-columns:118px minmax(0,1fr) minmax(0,1fr) 130px 216px;gap:16px;align-items:start;padding:14px 16px 14px 18px;border-bottom:1px solid var(--line);position:relative;transition:background .15s}
+.job:last-child{border-bottom:0}
+.job:hover{background:#FAFBFD}
+.job:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:var(--c)}
+.job.st-work{--c:var(--blue)}.job.st-planned{--c:var(--violet)}.job.st-open{--c:var(--amber)}.job.st-done{--c:#94A3B8}
+.job.st-done{background:#FBFCFD}.job.st-done .tailsel,.job.st-done .task-text{color:var(--mute)}
+@media(max-width:1250px){.job{grid-template-columns:110px 1fr 1fr}.job .stat-col{grid-column:2}.job .acts{grid-column:3;justify-content:flex-start}}
+@media(max-width:700px){.job{grid-template-columns:1fr}.job .stat-col,.job .acts{grid-column:auto}}
+.tailsel{all:unset;font-size:19px;font-weight:800;letter-spacing:.2px;cursor:pointer;border-radius:6px;padding:0 2px}
+.tailsel:hover:not(:disabled){background:#EEF2F7}
+.tailsel.off{font-size:14px;color:var(--amber)}
+.bayf{display:flex;align-items:center;gap:6px;margin-top:6px}
+.bayf span{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--mute)}
+.bayf input{width:58px;padding:3px 7px;font-weight:700;font-size:13px;border-color:transparent;background:#F1F4F8}
+.bayf input:hover{border-color:var(--line2)}
+.bayf input:disabled{background:transparent}
+.colh{font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--mute);text-transform:uppercase;margin-bottom:4px}
+.task-text{white-space:pre-wrap;line-height:1.45;padding:4px 0}
+.task-edit{border:1px solid transparent;background:transparent;padding:4px 7px;margin-left:-7px;min-height:0;resize:none;overflow:hidden;line-height:1.45;width:calc(100% + 7px)}
+.task-edit:hover{border-color:var(--line2);background:#fff}
+.task-edit:focus{border-color:var(--blue);background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#F1F4F8;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:3px 4px 3px 3px;font-weight:600;font-size:12.5px}
+.chip .av{width:22px;height:22px;font-size:9.5px}
+.chip small{font-weight:600;color:var(--mute);font-size:11px}
+.chip button{border:0;background:transparent;color:var(--mute);border-radius:999px;width:20px;height:20px;cursor:pointer;display:grid;place-items:center;padding:0}
+.chip button:hover{background:#E2E8F0;color:var(--red)}
+.chip.plain{padding-right:10px}
+.addeng{appearance:none;width:auto;max-width:110px;flex:none;font-size:12.5px;font-weight:600;color:var(--blue);background:var(--blueBg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232563EB' stroke-width='3'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") no-repeat 9px center;border:1px dashed #A7C1F5;border-radius:999px;padding:4px 10px 4px 25px;cursor:pointer}
+.status{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px;white-space:nowrap;background:color-mix(in srgb,var(--c) 11%,#fff);color:var(--c)}
+.status:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-work .status:before{animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.stat-col .sub{margin-top:6px;display:flex;align-items:center;gap:4px}
+.acts{display:flex;gap:6px;justify-content:flex-end;align-items:flex-start}
+/* team */
+.team-sec{padding:12px 14px}
+.team-sec+.team-sec{border-top:1px solid var(--line)}
+.team-sec h3{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+.team-sec h3 i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.team-sec h3 em{margin-left:auto;font-style:normal;background:#F1F4F8;color:var(--ink2);border-radius:999px;padding:1px 8px;font-size:11px}
+.person{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px}
+.person:hover{background:#F8FAFC}
+.person .nm{font-weight:700;font-size:13.5px}
+.person .ds{font-size:12px;color:var(--mute);margin-top:1px;line-height:1.35}
+.person .ds b{color:var(--ink2);font-weight:700}
+.person.off .nm{color:var(--mute);font-weight:600}
+.team-empty{font-size:12.5px;color:var(--mute);padding:4px 8px}
+details.offs summary{cursor:pointer;list-style:none}
+details.offs summary::-webkit-details-marker{display:none}
+/* tables (shift, history) */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--mute);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:#FAFBFD;font-weight:800}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tail{font-weight:800;white-space:nowrap}.tail.off{color:var(--amber)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.filters>*{width:auto;flex:1 1 140px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px 0}
+.stat{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--mute);font-weight:600}
+.stat b{display:block;font-size:20px;color:var(--ink)}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:13px}
+.switch input{appearance:none;width:36px;height:20px;border-radius:999px;background:#CBD5E1;position:relative;cursor:pointer;padding:0;border:0;transition:background .15s}
+.switch input:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch input:checked{background:var(--green)}
+.switch input:checked:after{left:18px}
+.namein{padding:5px 8px;border-color:transparent;font-weight:600;max-width:320px}.namein:hover{border-color:var(--line2)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.count{float:right}
+/* toast */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:11px 14px 11px 16px;border-radius:10px;font-weight:600;z-index:60;display:flex;align-items:center;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:all .2s}
+#toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#toast button{font:inherit;font-weight:700;color:#93C5FD;background:transparent;border:0;cursor:pointer;padding:2px 4px}
 /* ---------- DISPLAY BOARD ---------- */
 #display{position:fixed;inset:0;z-index:50;background:radial-gradient(1200px 600px at 10% -10%,#1E3A5F 0%,#0B1220 55%) #0B1220;color:#E2E8F0;display:flex;flex-direction:column;padding:1.4vw 1.6vw;gap:1.2vw;font-size:1vw;overflow:hidden}
 #display.hide{display:none}
@@ -131,59 +228,74 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </head>
 <body>
 <header>
-  <h1>Work Allocation</h1>
+  <div class="brand"><div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><div><h1>Line Tasking</h1><small>Work allocation</small></div></div>
   <nav>
-    <button data-tab="board" class="on">Board</button>
-    <button data-tab="shift">Shift list</button>
-    <button data-tab="history">History</button>
+    <button data-tab="board" class="on"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Board</button>
+    <button data-tab="shift"><svg class="i" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Shift list</button>
+    <button data-tab="history"><svg class="i" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>History</button>
   </nav>
-  <button class="btn" id="openDisplay" style="background:#1E293B;color:#fff;border-color:#334155">📺 Wall board</button>
-  <span class="clock" id="clock" style="margin-left:auto"></span>
+  <div class="hdr-right">
+    <span class="shiftpill"><i></i><span id="shiftName">Early shift</span></span>
+    <span class="clock" id="clock"></span>
+    <button class="hbtn" id="shareAll" title="Send the whole board as a text"><svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg><span class="l">Send to group</span></button>
+    <button class="hbtn solid" id="openDisplay" title="Full-screen board for the hangar screen"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span class="l">Wall board</span></button>
+  </div>
 </header>
 
 <main>
 <!-- BOARD -->
 <section id="tab-board">
+  <div class="kpis">
+    <button class="kpi" data-k="work" style="--c:var(--blue)"><span class="dot"><svg class="i" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg></span><div><b id="kpWork">0</b><span>In work</span></div></button>
+    <button class="kpi" data-k="planned" style="--c:var(--violet)"><span class="dot"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><b id="kpPlan">0</b><span>Not started</span></div></button>
+    <button class="kpi" data-k="open" style="--c:var(--amber)"><span class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div><b id="kpOpen">0</b><span>Unmanned</span></div></button>
+    <button class="kpi" data-k="done" style="--c:var(--green)"><span class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><b id="kpDone">0</b><span>Done this shift</span></div></button>
+    <button class="kpi" data-k="team" style="--c:#0EA5E9"><span class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><div><b id="kpTeam">0/0</b><span>Free / on shift</span></div></button>
+  </div>
   <div class="grid">
-    <div class="card">
-      <h2>New job</h2>
-      <div class="addrow">
-        <select id="nTail"></select>
-        <input id="nBay" placeholder="Bay">
-        <textarea id="nTask" class="task" placeholder="Task / tasks"></textarea>
-        <div id="nEng" class="engs picker"></div>
-        <button class="btn pri" id="addJob">Add job</button>
+    <div class="stack">
+      <div class="card">
+        <div class="card-h"><h2>Raise a job</h2><span class="sub" style="margin-left:auto">Ctrl + Enter to add</span></div>
+        <div class="card-b newjob">
+          <div><label class="f" for="nTail">Aircraft</label><select id="nTail"></select></div>
+          <div><label class="f" for="nBay">Bay</label><input id="nBay" placeholder="e.g. 3"></div>
+          <div class="engf"><label class="f">Engineers <span style="text-transform:none;letter-spacing:0;font-weight:600">– tap to select</span></label><div id="nEng" class="picker"></div></div>
+          <div class="tasks">
+            <div><label class="f" for="nTask">Task(s) – one per line</label><textarea id="nTask" rows="2" placeholder="e.g. No.2 engine oil replen&#10;Fwd door seal inspection"></textarea></div>
+            <button class="btn pri big" id="addJob"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add job</button>
+          </div>
+        </div>
       </div>
-      <div class="toolbar">
-        <label class="switch"><input type="checkbox" id="showDone"> Show completed today</label>
-        <button class="btn pri" id="shareAll" style="margin-left:auto">📤 Send to group</button>
-        <select id="sortBy" style="width:auto"><option value="tail">Sort by tail</option><option value="bay">Sort by bay</option><option value="status">Sort by status</option><option value="new">Newest first</option></select>
-      </div>
-      <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Tail</th><th>Bay</th><th>Task(s)</th><th>Engineer(s)</th><th>Status</th><th></th></tr></thead>
-        <tbody id="jobs"></tbody>
-      </table>
+      <div class="card">
+        <div class="jobs-h">
+          <h2>Jobs</h2>
+          <div class="pills" id="pills">
+            <button data-f="active" class="on">Open <i id="pcActive">0</i></button>
+            <button data-f="work">In work <i id="pcWork">0</i></button>
+            <button data-f="planned">Not started <i id="pcPlan">0</i></button>
+            <button data-f="open">Unmanned <i id="pcOpen">0</i></button>
+            <button data-f="done">Done this shift <i id="pcDone">0</i></button>
+          </div>
+          <div class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Search tail, bay, task, name"></div>
+          <select id="sortBy"><option value="tail">Sort: tail</option><option value="status">Sort: status</option><option value="bay">Sort: bay</option><option value="new">Sort: newest</option></select>
+        </div>
+        <div id="jobs"></div>
       </div>
     </div>
-    <div>
-      <div class="card people">
-        <h2>Available <span class="count" id="cFree">0</span></h2>
-        <div id="freeList"></div>
-      </div>
-      <div class="card people" style="margin-top:12px">
-        <h2>Working <span class="count" id="cBusy">0</span></h2>
-        <div id="busyList"></div>
-      </div>
+    <div class="card" id="team">
+      <div class="card-h"><h2>Team</h2><span class="sub" style="margin-left:auto" id="teamSub"></span></div>
+      <div class="team-sec" style="--c:var(--green)"><h3><i></i>Available<em id="cFree">0</em></h3><div id="freeList"></div></div>
+      <div class="team-sec" style="--c:var(--blue)"><h3><i></i>Working<em id="cBusy">0</em></h3><div id="busyList"></div></div>
+      <details class="team-sec offs" style="--c:#CBD5E1"><summary><h3 style="margin:0"><i></i>Off shift<em id="cOff">0</em></h3></summary><div id="offList" style="margin-top:8px"></div></details>
     </div>
   </div>
 </section>
 
 <!-- SHIFT -->
 <section id="tab-shift" class="hide">
-  <div class="grid">
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) 340px">
     <div class="card">
-      <h2>Shift list</h2>
+      <div class="card-h"><h2>Shift list</h2><span class="sub" style="margin-left:auto">Toggle who's on today – names can be edited in place</span></div>
       <div class="toolbar">
         <button class="btn" id="allOn">All on shift</button>
         <button class="btn" id="allOff">Clear shift (new shift)</button>
@@ -193,14 +305,14 @@ button:disabled{opacity:.45;cursor:not-allowed}
         <tbody id="engs"></tbody>
       </table>
     </div>
-    <div class="card">
-      <h2>Add engineers</h2>
-      <p class="sub">One per line, e.g. <i>Cpl Smith</i>. You can paste a whole list.</p>
+    <div class="card pad">
+      <h2 style="padding-bottom:4px">Add engineers</h2>
+      <p class="sub" style="margin-top:0">One per line, e.g. <i>Cpl Smith</i>. You can paste a whole list.</p>
       <textarea id="engPaste" rows="8"></textarea>
       <button class="btn pri" id="addEngs" style="margin-top:8px;width:100%">Add to list</button>
-      <h2 style="margin-top:20px">Backup</h2>
+      <h2 style="padding:22px 0 4px">Backup</h2>
       <p class="sub">Records are saved on this device. Export a backup now and then.</p>
-      <div class="toolbar">
+      <div style="display:flex;gap:8px">
         <button class="btn" id="exportJson">Export backup</button>
         <label class="btn">Import backup<input type="file" id="importJson" accept=".json" hidden></label>
       </div>
@@ -211,7 +323,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <!-- HISTORY -->
 <section id="tab-history" class="hide">
   <div class="card">
-    <h2>Record of work</h2>
+    <div class="card-h"><h2>Record of work</h2><span class="sub" style="margin-left:auto">Every completed job, who worked it and for how long</span></div>
     <div class="filters">
       <select id="fEng"><option value="">All engineers</option></select>
       <select id="fTail"><option value="">All tails</option></select>
@@ -221,7 +333,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
       <button class="btn" id="exportCsv">Export CSV</button>
     </div>
     <div class="stats" id="stats"></div>
-    <div class="tbl-wrap">
+    <div class="tbl-wrap" style="padding-top:12px">
     <table>
       <thead><tr><th>Completed</th><th>Tail</th><th>Bay</th><th>Task(s)</th><th>Engineer(s)</th><th>Raised</th><th>Duration</th></tr></thead>
       <tbody id="hist"></tbody>
@@ -280,13 +392,13 @@ const jobMaps=()=>{const w={},p={};D.jobs.filter(active).forEach(j=>current(j).f
 const label=j=>esc(j.tail)+(j.bay?" B"+esc(j.bay):"");
 
 /* ---------- tabs & clock ---------- */
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{window.scrollTo(0,0);
   document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
   ["board","shift","history"].forEach(t=>$("#tab-"+t).classList.toggle("hide",t!==b.dataset.tab));
   render();
 });
-const tick=()=>$("#clock").textContent=new Date().toLocaleString("en-GB",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
-tick();setInterval(tick,30000);
+const tick=()=>{const d=new Date(),h=d.getHours();$("#clock").textContent=d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});$("#shiftName").textContent=(h>=6&&h<18?"Early shift · 06–18":"Late shift · 18–06")};
+tick();setInterval(tick,15000);
 
 /* ---------- board ---------- */
 $("#nTail").innerHTML=TAILS.map(t=>`<option>${t}</option>`).join("");
@@ -298,10 +410,16 @@ $("#addJob").onclick=()=>{
     created:now(),started:null,completed:null,assignments:engs.map(e=>({eng:e,from:null,to:null}))});
   $("#nTask").value="";$("#nBay").value="";
   $("#nEng").querySelectorAll(".pick.sel").forEach(b=>b.classList.remove("sel"));
-  save();
+  save();toast("Job added – "+D.jobs[D.jobs.length-1].tail);$("#nTask").focus();
 };
+["#nTask","#nBay"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("#addJob").click()}}));
+$("#nBay").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.ctrlKey&&!e.metaKey){e.preventDefault();$("#nTask").focus()}});
 $("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(b)b.classList.toggle("sel")});
-$("#showDone").onchange=render;$("#sortBy").onchange=render;
+let FILTER="active";
+$("#sortBy").onchange=render;$("#q").addEventListener("input",render);
+const setFilter=f=>{FILTER=f;document.querySelectorAll("#pills button").forEach(b=>b.classList.toggle("on",b.dataset.f===f));render()};
+$("#pills").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setFilter(b.dataset.f)});
+document.querySelectorAll(".kpi").forEach(k=>k.onclick=()=>{if(k.dataset.k==="team"){$("#team").scrollIntoView({behavior:"smooth"});return}setFilter(FILTER===k.dataset.k?"active":k.dataset.k)});
 
 const job=id=>D.jobs.find(x=>x.id===id);
 function settle(j){ // status for a job not yet started
@@ -322,7 +440,7 @@ function start(jobId){
   const j=job(jobId);const t=now();
   j.status="work";j.started=j.started||t;
   j.assignments.forEach(a=>{if(!a.to&&!a.from)a.from=t});
-  save();
+  save();toast(j.tail+" started");
 }
 function stop(jobId){ // put back to not started (e.g. paused / started by mistake)
   const j=job(jobId);const t=now();
@@ -333,7 +451,7 @@ function complete(jobId){
   const j=job(jobId);const t=now();
   j.started=j.started||t;
   j.assignments.forEach(a=>{if(!a.to){a.from=a.from||j.started;a.to=t}});
-  j.status="done";j.completed=t;save();
+  j.status="done";j.completed=t;save();toast(j.tail+" complete",()=>{reopen(jobId)});
 }
 function reopen(jobId){
   const j=job(jobId);j.status="open";j.completed=null;
@@ -341,56 +459,75 @@ function reopen(jobId){
   settle(j);save();
 }
 function del(jobId){
-  if(!confirm("Delete this job? It will be removed from the record too."))return;
-  D.jobs=D.jobs.filter(x=>x.id!==jobId);save();
+  const i=D.jobs.findIndex(x=>x.id===jobId);const [gone]=D.jobs.splice(i,1);save();
+  toast("Job deleted",()=>{D.jobs.splice(i,0,gone);save()});
 }
 function editField(jobId,field,val){const j=job(jobId);if(field==="task"&&!val){render();return}if(j[field]!==val){j[field]=val;j.edited=now()}save()}
 
+const AVC=["#2563EB","#7C3AED","#DB2777","#EA580C","#0891B2","#16A34A","#CA8A04","#4F46E5","#0D9488","#9333EA"];
+function initials(n){const w=n.replace(/^(AS1|AS2|SAC|LAC|Cpl|Sgt|FS|CT|Chf\s*Tech|Mr|Mrs|Ms)\.?\s+/i,"").trim().split(/\s+/);return((w[0]||"?")[0]+(w[1]?w[1][0]:(w[0]||"")[1]||"")).toUpperCase()}
+function av(id){const n=engName(id);let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;return `<span class="av" style="background:${AVC[h%AVC.length]}">${esc(initials(n))}</span>`}
+const IC={play:`<svg class="i" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,check:`<svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,pause:`<svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,send:`<svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>`,trash:`<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`,undo:`<svg class="i" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>`,x:`<svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>`,clock:`<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`};
+const ago=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 function renderBoard(){
   const {w,p}=jobMaps();
-  const onShift=D.engineers.filter(e=>e.onShift);
+  const onShift=D.engineers.filter(e=>e.onShift).sort((a,b)=>a.name.localeCompare(b.name));
   const where=id=>[...(w[id]||[]).map(j=>"on "+label(j)),...(p[id]||[]).map(j=>"next "+label(j))].join(", ");
+  // picker
   const keep=new Set([...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id));
-  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}${w[e.id]?" isbusy":""}" data-id="${e.id}">${esc(e.name)}${w[e.id]?" · on "+label(w[e.id][0]):""}</button>`).join("")||`<span class="sub">Tick people on shift in Shift list</span>`;
-  const sod=new Date();sod.setHours(sod.getHours()<6?-18:0,0,0,0);
-  let jobs=D.jobs.filter(j=>active(j)||($("#showDone").checked&&new Date(j.completed)>=sod));
+  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}" data-id="${e.id}">${av(e.id)}${esc(e.name)}${w[e.id]?`<em>${label(w[e.id][0])}</em>`:""}</button>`).join("")||`<span class="sub">Nobody on shift yet – add your team in <a href="#" id="goShift">Shift list</a></span>`;
+  $("#goShift")?.addEventListener("click",e=>{e.preventDefault();document.querySelector('nav button[data-tab=shift]').click()});
+  // counts
+  const ss=shiftStart();
+  const act=D.jobs.filter(active);
+  const doneShift=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=ss);
+  const n={work:act.filter(j=>j.status==="work").length,planned:act.filter(j=>j.status==="planned").length,open:act.filter(j=>j.status==="open").length,done:doneShift.length};
+  const freeE=onShift.filter(e=>!w[e.id]),busyE=onShift.filter(e=>w[e.id]),offE=D.engineers.filter(e=>!e.onShift).sort((a,b)=>a.name.localeCompare(b.name));
+  $("#kpWork").textContent=n.work;$("#kpPlan").textContent=n.planned;$("#kpOpen").textContent=n.open;$("#kpDone").textContent=n.done;$("#kpTeam").textContent=freeE.length+"/"+onShift.length;
+  $("#pcActive").textContent=act.length;$("#pcWork").textContent=n.work;$("#pcPlan").textContent=n.planned;$("#pcOpen").textContent=n.open;$("#pcDone").textContent=n.done;
+  document.querySelectorAll(".kpi").forEach(k=>k.classList.toggle("on",k.dataset.k===FILTER));
+  // jobs list
+  let jobs=FILTER==="done"?doneShift:FILTER==="active"?act:act.filter(j=>j.status===FILTER);
+  const q=$("#q").value.trim().toLowerCase();
+  if(q)jobs=jobs.filter(j=>(j.tail+" "+j.bay+" "+j.task+" "+j.assignments.map(a=>engName(a.eng)).join(" ")).toLowerCase().includes(q));
   const s=$("#sortBy").value, rank={work:0,planned:1,open:2,done:3};
-  jobs.sort((a,b)=>(a.status==="done")-(b.status==="done")||(s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]:TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail)));
+  jobs=[...jobs].sort((a,b)=>s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]||TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail));
+  const emptyMsg={active:["No open jobs","Raise a job above to get started."],work:["Nothing in work","Press Start on a job when the team cracks on."],planned:["Nothing waiting to start",""],open:["No unmanned jobs","Every open job has someone on it."],done:["Nothing completed this shift yet",""]}[FILTER];
   $("#jobs").innerHTML=jobs.map(j=>{
-    const cur=current(j);
+    const cur=current(j),done=j.status==="done",off=j.tail==="Off Aircraft";
     const free=onShift.filter(e=>!cur.includes(e.id));
-    const done=j.status==="done";
     const chips=done
-      ?[...new Set(j.assignments.filter(a=>a.from).map(a=>a.eng))].map(e=>`<span class="chip" style="padding-right:10px">${esc(engName(e))}</span>`).join("")
-      :cur.map(e=>{const other=(w[e]||[]).filter(o=>o.id!==j.id);return `<span class="chip" ${other.length&&j.status!=="work"?`title="Currently on ${label(other[0])}"`:""}>${esc(engName(e))}${other.length?` <span class="sub">(on ${label(other[0])})</span>`:""}<button data-un="${j.id}|${e}" title="Take off job">×</button></span>`}).join("");
-    const st=done?`<span class="status s-done">Complete</span><div class="sub">${fmt(j.completed)}</div>`
-      :j.status==="work"?`<span class="status s-work">In work</span><div class="sub">since ${fmt(j.started)}</div>`
-      :j.status==="planned"?`<span class="status s-plan">Assigned – not started</span>`
-      :`<span class="status s-open">Unmanned</span>`;
-    const btns=done?`<button class="btn sm" data-reopen="${j.id}">Reopen</button>`
-      :j.status==="work"?`<button class="btn ok sm" data-done="${j.id}">Complete</button> <button class="btn sm" data-stop="${j.id}" title="Back to not started">Stop</button>`
-      :`<button class="btn pri sm" data-start="${j.id}" ${cur.length?"":"disabled title='Assign someone first'"}>Start</button> <button class="btn ok sm" data-done="${j.id}">Complete</button>`;
-    return `<tr class="${done?"done":""} row-${j.status}">
-      <td><select data-f="tail" data-id="${j.id}" class="tail ${j.tail==="Off Aircraft"?"off":""}" ${done?"disabled":""} style="width:auto;border:0;padding:2px;font-weight:800">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select></td>
-      <td><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} style="width:80px;padding:4px 6px"></td>
-      <td>${done?`<div class="task-text">${esc(j.task)}</div>`:`<textarea class="task-edit" data-f="task" data-id="${j.id}" rows="${Math.max(1,j.task.split("\n").length)}" title="Click to amend">${esc(j.task)}</textarea>`}</td>
-      <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" ("+where(e.id)+")":""}</option>`).join("")}</select></div>`}</td>
-      <td>${st}</td>
-      <td style="white-space:nowrap">${btns} ${done?"":`<button class="btn sm" data-share="${j.id}" title="Send this job as a text">📤</button>`} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
-    </tr>`}).join("")||`<tr><td colspan="6" class="empty">No open jobs. Add one above.</td></tr>`;
-
-  const freeE=onShift.filter(e=>!w[e.id]);
-  const busyE=onShift.filter(e=>w[e.id]);
-  $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;
-  $("#freeList").innerHTML=freeE.map(e=>`<div class="p free">${esc(e.name)}${p[e.id]?`<small>next: ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="sub">${onShift.length?"Everyone is working":"Nobody marked on shift – see Shift list"}</div>`;
-  $("#busyList").innerHTML=busyE.map(e=>`<div class="p busy">${esc(e.name)}<small>${w[e.id].map(j=>label(j)+" – "+esc(j.task.split("\n")[0].slice(0,24))).join("<br>")}${p[e.id]?`<br><span style="color:var(--mute)">next: ${p[e.id].map(label).join(", ")}</span>`:""}</small></div>`).join("")||`<div class="sub">Nobody working a job</div>`;
+      ?whoDid(j).map(x=>`<span class="chip plain">${av(x.id)}${esc(x.name)} <small>${x.mins<60?x.mins+"m":Math.floor(x.mins/60)+"h"+String(x.mins%60).padStart(2,"0")}</small></span>`).join("")
+      :cur.map(e=>{const other=(w[e]||[]).filter(o=>o.id!==j.id);return `<span class="chip">${av(e)}${esc(engName(e))}${other.length?` <small>on ${label(other[0])}</small>`:""}<button data-un="${j.id}|${e}" title="Take ${esc(engName(e))} off this job">${IC.x}</button></span>`}).join("");
+    const addSel=done?"":`<select class="addeng" data-add="${j.id}"><option value="">${cur.length?"Add":"Assign"}</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" – "+where(e.id):""}</option>`).join("")}</select>`;
+    const st=done?`<span class="status">Complete</span><div class="sub">${IC.check} ${fmt(j.completed)}</div>`
+      :j.status==="work"?`<span class="status">In work</span><div class="sub">${IC.clock} ${ago(j.started)}</div>`
+      :j.status==="planned"?`<span class="status">Not started</span><div class="sub">Raised ${fmt(j.created)}</div>`
+      :`<span class="status">Unmanned</span><div class="sub">Raised ${fmt(j.created)}</div>`;
+    const acts=done?`<button class="btn sm" data-reopen="${j.id}">${IC.undo}Reopen</button>`
+      :j.status==="work"?`<button class="btn ok sm" data-done="${j.id}">${IC.check}Complete</button><button class="btn icon" data-stop="${j.id}" title="Stop – back to not started">${IC.pause}</button>`
+      :`<button class="btn pri sm" data-start="${j.id}" ${cur.length?"":"disabled title='Assign an engineer first'"}>${IC.play}Start</button><button class="btn icon" data-done="${j.id}" title="Mark complete">${IC.check}</button>`;
+    return `<div class="job st-${j.status}">
+      <div><select data-f="tail" data-id="${j.id}" class="tailsel ${off?"off":""}" ${done?"disabled":""} title="Change aircraft">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select>
+        <div class="bayf"><span>BAY</span><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} placeholder="–"></div></div>
+      <div><div class="colh">Task</div>${done?`<div class="task-text">${esc(j.task)}</div>`:`<textarea class="task-edit" data-f="task" data-id="${j.id}" rows="${Math.max(1,j.task.split("\n").length)}" title="Click to amend">${esc(j.task)}</textarea>`}</div>
+      <div><div class="colh">Engineers</div><div class="chips">${chips}${addSel}</div></div>
+      <div class="stat-col">${st}</div>
+      <div class="acts">${acts}${done?"":`<button class="btn icon" data-share="${j.id}" title="Send this job as a text">${IC.send}</button>`}<button class="btn icon warn" data-del="${j.id}" title="Delete job">${IC.trash}</button></div>
+    </div>`}).join("")||`<div class="empty"><b>${q?"No jobs match “"+esc(q)+"”":emptyMsg[0]}</b>${q?"":emptyMsg[1]}</div>`;
+  // team
+  $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;$("#cOff").textContent=offE.length;
+  $("#teamSub").textContent=onShift.length+" on shift";
+  $("#freeList").innerHTML=freeE.map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)}</div>${p[e.id]?`<div class="ds">Next: <b>${p[e.id].map(label).join(", ")}</b></div>`:`<div class="ds">Free to task</div>`}</div></div>`).join("")||`<div class="team-empty">${onShift.length?"Everyone is working":"Nobody marked on shift"}</div>`;
+  $("#busyList").innerHTML=busyE.map(e=>`<div class="person">${av(e.id)}<div><div class="nm">${esc(e.name)}</div><div class="ds">${w[e.id].map(j=>`<b>${label(j)}</b> · ${esc(j.task.split("\n")[0].slice(0,30))}`).join("<br>")}${p[e.id]?`<br>Next: ${p[e.id].map(label).join(", ")}`:""}</div></div></div>`).join("")||`<div class="team-empty">Nobody on a started job</div>`;
+  $("#offList").innerHTML=offE.map(e=>`<div class="person off">${av(e.id)}<div class="nm">${esc(e.name)}</div></div>`).join("")||`<div class="team-empty">–</div>`;
 }
 $("#jobs").addEventListener("click",e=>{
-  const t=e.target;
+  const t=e.target.closest("button");if(!t)return;
   if(t.dataset.un){const[j,en]=t.dataset.un.split("|");unassign(j,en)}
   else if(t.dataset.done)complete(t.dataset.done);
   else if(t.dataset.start)start(t.dataset.start);
-  else if(t.closest("[data-share]"))share(jobText(job(t.closest("[data-share]").dataset.share),true));
+  else if(t.dataset.share)share(jobText(job(t.dataset.share),true));
   else if(t.dataset.stop)stop(t.dataset.stop);
   else if(t.dataset.reopen)reopen(t.dataset.reopen);
   else if(t.dataset.del)del(t.dataset.del);
@@ -428,7 +565,10 @@ async function share(text){
   try{await navigator.clipboard.writeText(text);toast("Copied – paste it into the group chat")}
   catch(e){prompt("Copy this and paste it into the group:",text)}
 }
-function toast(m){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;z-index:9";document.body.append(t)}t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",2500)}
+function toast(m,undo){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";document.body.append(t)}
+  t.innerHTML=`<span>${esc(m)}</span>${undo?"<button>Undo</button>":""}`;
+  if(undo)t.querySelector("button").onclick=()=>{t.classList.remove("show");undo()};
+  t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),undo?6000:2500)}
 $("#shareAll").onclick=()=>share(boardText());
 
 /* ---------- shift ---------- */
@@ -443,7 +583,7 @@ function renderShift(){
   const cnt={};D.jobs.filter(j=>j.status==="done").forEach(j=>new Set(j.assignments.filter(a=>a.from).map(a=>a.eng)).forEach(e=>cnt[e]=(cnt[e]||0)+1));
   const list=[...D.engineers].sort((a,b)=>a.name.localeCompare(b.name));
   $("#engs").innerHTML=list.map(e=>`<tr>
-    <td><input data-name="${e.id}" value="${esc(e.name)}" style="padding:4px 8px"></td>
+    <td><div style="display:flex;align-items:center;gap:10px">${av(e.id)}<input data-name="${e.id}" value="${esc(e.name)}" class="namein"></div></td>
     <td><label class="switch"><input type="checkbox" data-on="${e.id}" ${e.onShift?"checked":""}> ${e.onShift?"On":"Off"}</label></td>
     <td>${cnt[e.id]||0}</td>
     <td><button class="btn warn sm" data-rm="${e.id}">Remove</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Add your shift list on the right.</td></tr>`;
@@ -491,7 +631,7 @@ function histRows(){
 }
 function whoDid(j){
   const m={};j.assignments.filter(a=>a.from).forEach(a=>{m[a.eng]=(m[a.eng]||0)+((new Date(a.to||j.completed))-new Date(a.from))});
-  return Object.entries(m).map(([e,ms])=>({name:nameOf(e),mins:Math.round(ms/60000)}));
+  return Object.entries(m).map(([e,ms])=>({id:e,name:nameOf(e),mins:Math.round(ms/60000)}));
 }
 function renderHistory(){
   const fe=$("#fEng").value,ft=$("#fTail").value;
@@ -503,7 +643,7 @@ function renderHistory(){
   $("#hist").innerHTML=rows.map(j=>`<tr>
     <td style="white-space:nowrap">${fmt(j.completed)}</td><td class="tail ${j.tail==="Off Aircraft"?"off":""}">${esc(j.tail)}</td><td>${esc(j.bay)}</td>
     <td class="task-text">${esc(j.task)}</td>
-    <td>${whoDid(j).map(w=>`<span class="chip" style="padding-right:10px">${esc(w.name)} <span class="sub">${w.mins<60?w.mins+"m":Math.floor(w.mins/60)+"h"+String(w.mins%60).padStart(2,"0")}</span></span>`).join("")}</td>
+    <td><div class="chips">${whoDid(j).map(w=>`<span class="chip plain">${av(w.id)}${esc(w.name)} <span class="sub">${w.mins<60?w.mins+"m":Math.floor(w.mins/60)+"h"+String(w.mins%60).padStart(2,"0")}</span></span>`).join("")}</div></td>
     <td class="sub" style="white-space:nowrap">${fmt(j.created)}</td><td>${dur(j.started||j.created,j.completed)}</td></tr>`).join("")||`<tr><td colspan="7" class="empty">No completed jobs match.</td></tr>`;
 }
 $("#exportCsv").onclick=()=>{
@@ -576,6 +716,7 @@ $("#openDisplay").onclick=openDisplay;$("#dbExit").onclick=closeDisplay;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#display").classList.contains("hide")&&!document.fullscreenElement)closeDisplay()});
 window.addEventListener("resize",()=>{document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");renderDisplay()});
 setInterval(renderDisplay,15000);
+setInterval(()=>{if(!$("#tab-board").classList.contains("hide")&&!document.activeElement?.closest("#jobs,#tab-board .newjob"))renderBoard()},60000);
 if(location.hash==="#display"){$("#display").classList.remove("hide")}
 
 /* ---------- render ---------- */
