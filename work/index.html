@@ -46,6 +46,11 @@ button.sm{padding:4px 8px;font-size:13px}
 .status{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12px;white-space:nowrap}
 .s-open{background:var(--amberbg);color:var(--amber)}
 .s-work{background:#DBEAFE;color:var(--blue)}
+.s-plan{background:#EDE9FE;color:#6D28D9}
+tr.row-planned td:first-child{box-shadow:inset 4px 0 #8B5CF6}
+tr.row-work td:first-child{box-shadow:inset 4px 0 var(--blue)}
+tr.row-open td:first-child{box-shadow:inset 4px 0 #F59E0B}
+button:disabled{opacity:.45;cursor:not-allowed}
 .s-done{background:var(--greenbg);color:var(--green)}
 .sub{color:var(--mute);font-size:12px}
 .people .p{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;margin-bottom:5px;font-weight:600}
@@ -95,7 +100,7 @@ button.sm{padding:4px 8px;font-size:13px}
       </div>
       <div class="toolbar">
         <label class="switch"><input type="checkbox" id="showDone"> Show completed today</label>
-        <select id="sortBy" style="width:auto"><option value="tail">Sort by tail</option><option value="bay">Sort by bay</option><option value="new">Newest first</option></select>
+        <select id="sortBy" style="width:auto"><option value="tail">Sort by tail</option><option value="bay">Sort by bay</option><option value="status">Sort by status</option><option value="new">Newest first</option></select>
       </div>
       <div class="tbl-wrap">
       <table>
@@ -110,7 +115,7 @@ button.sm{padding:4px 8px;font-size:13px}
         <div id="freeList"></div>
       </div>
       <div class="card people" style="margin-top:12px">
-        <h2>Tasked <span class="count" id="cBusy">0</span></h2>
+        <h2>Working <span class="count" id="cBusy">0</span></h2>
         <div id="busyList"></div>
       </div>
     </div>
@@ -190,7 +195,9 @@ const eng=id=>D.engineers.find(e=>e.id===id);
 const engName=id=>nameOf(id);
 const active=j=>j.status!=="done";
 const current=j=>j.assignments.filter(a=>!a.to).map(a=>a.eng);
-const busyMap=()=>{const m={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>(m[e]=m[e]||[]).push(j)));return m};
+// jobs each engineer is on, split by started (in work) vs not started
+const jobMaps=()=>{const w={},p={};D.jobs.filter(active).forEach(j=>current(j).forEach(e=>{const m=j.status==="work"?w:p;(m[e]=m[e]||[]).push(j)}));return{w,p}};
+const label=j=>esc(j.tail)+(j.bay?" B"+esc(j.bay):"");
 
 /* ---------- tabs & clock ---------- */
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
@@ -207,11 +214,8 @@ $("#addJob").onclick=()=>{
   const task=$("#nTask").value.trim();
   if(!task){$("#nTask").focus();return}
   const engs=[...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id);
-  const t=now();
-  D.jobs.push({id:uid(),tail:$("#nTail").value,bay:$("#nBay").value.trim(),task,status:engs.length?"work":"open",
-    created:t,started:engs.length?t:null,completed:null,assignments:engs.map(e=>({eng:e,from:t,to:null}))});
-  const nid=D.jobs[D.jobs.length-1].id;
-  D.jobs.filter(o=>active(o)&&o.id!==nid).forEach(o=>{o.assignments.forEach(a=>{if(engs.includes(a.eng)&&!a.to)a.to=t});if(o.status==="work"&&!current(o).length)o.status="open"});
+  D.jobs.push({id:uid(),tail:$("#nTail").value,bay:$("#nBay").value.trim(),task,status:engs.length?"planned":"open",
+    created:now(),started:null,completed:null,assignments:engs.map(e=>({eng:e,from:null,to:null}))});
   $("#nTask").value="";$("#nBay").value="";
   $("#nEng").querySelectorAll(".pick.sel").forEach(b=>b.classList.remove("sel"));
   save();
@@ -219,74 +223,94 @@ $("#addJob").onclick=()=>{
 $("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(b)b.classList.toggle("sel")});
 $("#showDone").onchange=render;$("#sortBy").onchange=render;
 
+const job=id=>D.jobs.find(x=>x.id===id);
+function settle(j){ // status for a job not yet started
+  if(j.status!=="work"&&j.status!=="done")j.status=current(j).length?"planned":"open";
+}
 function assign(jobId,engId){
-  const j=D.jobs.find(x=>x.id===jobId);if(!j||!engId)return;
-  const t=now();
-  // re-task: release engineer from any other active job
-  D.jobs.filter(active).forEach(o=>o.assignments.forEach(a=>{if(a.eng===engId&&!a.to&&o.id!==jobId)a.to=t}));
-  D.jobs.filter(active).forEach(o=>{if(o.status==="work"&&!current(o).length)o.status="open"});
-  if(!current(j).includes(engId))j.assignments.push({eng:engId,from:t,to:null});
-  if(j.status==="open"){j.status="work";j.started=j.started||t}
-  save();
+  const j=job(jobId);if(!j||!engId||current(j).includes(engId))return;
+  j.assignments.push({eng:engId,from:j.status==="work"?now():null,to:null});
+  settle(j);save();
 }
 function unassign(jobId,engId){
-  const j=D.jobs.find(x=>x.id===jobId);const t=now();
+  const j=job(jobId);const t=now();
+  j.assignments=j.assignments.filter(a=>!(a.eng===engId&&!a.to&&!a.from)); // never started: just drop
   j.assignments.forEach(a=>{if(a.eng===engId&&!a.to)a.to=t});
-  if(!current(j).length&&j.status==="work")j.status="open";
+  settle(j);save();
+}
+function start(jobId){
+  const j=job(jobId);const t=now();
+  j.status="work";j.started=j.started||t;
+  j.assignments.forEach(a=>{if(!a.to&&!a.from)a.from=t});
   save();
 }
+function stop(jobId){ // put back to not started (e.g. paused / started by mistake)
+  const j=job(jobId);const t=now();
+  j.assignments.forEach(a=>{if(!a.to&&a.from){a.to=t;j.assignments.push({eng:a.eng,from:null,to:null})}});
+  j.status="work";j.status=current(j).length?"planned":"open";save();
+}
 function complete(jobId){
-  const j=D.jobs.find(x=>x.id===jobId);const t=now();
-  j.assignments.forEach(a=>{if(!a.to)a.to=t});
+  const j=job(jobId);const t=now();
+  j.started=j.started||t;
+  j.assignments.forEach(a=>{if(!a.to){a.from=a.from||j.started;a.to=t}});
   j.status="done";j.completed=t;save();
 }
 function reopen(jobId){
-  const j=D.jobs.find(x=>x.id===jobId);j.status="open";j.completed=null;save();
+  const j=job(jobId);j.status="open";j.completed=null;
+  [...new Set(j.assignments.map(a=>a.eng))].forEach(e=>j.assignments.push({eng:e,from:null,to:null}));
+  settle(j);save();
 }
 function del(jobId){
   if(!confirm("Delete this job? It will be removed from the record too."))return;
   D.jobs=D.jobs.filter(x=>x.id!==jobId);save();
 }
-function editField(jobId,field,val){const j=D.jobs.find(x=>x.id===jobId);j[field]=val;save()}
+function editField(jobId,field,val){job(jobId)[field]=val;save()}
 
 function renderBoard(){
-  const busy=busyMap();
+  const {w,p}=jobMaps();
   const onShift=D.engineers.filter(e=>e.onShift);
+  const where=id=>[...(w[id]||[]).map(j=>"on "+label(j)),...(p[id]||[]).map(j=>"next "+label(j))].join(", ");
   const keep=new Set([...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id));
-  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}${busy[e.id]?" isbusy":""}" data-id="${e.id}" title="${busy[e.id]?"Currently on "+esc(busy[e.id][0].tail)+" – picking re-tasks them":""}">${esc(e.name)}${busy[e.id]?" · "+esc(busy[e.id][0].tail):""}</button>`).join("")||`<span class="sub">Tick people on shift in Shift list</span>`;
+  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}${w[e.id]?" isbusy":""}" data-id="${e.id}">${esc(e.name)}${w[e.id]?" · on "+label(w[e.id][0]):""}</button>`).join("")||`<span class="sub">Tick people on shift in Shift list</span>`;
   const sod=new Date();sod.setHours(sod.getHours()<6?-18:0,0,0,0);
   let jobs=D.jobs.filter(j=>active(j)||($("#showDone").checked&&new Date(j.completed)>=sod));
-  const s=$("#sortBy").value;
-  jobs.sort((a,b)=>(a.status==="done")-(b.status==="done")||(s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail)));
+  const s=$("#sortBy").value, rank={work:0,planned:1,open:2,done:3};
+  jobs.sort((a,b)=>(a.status==="done")-(b.status==="done")||(s==="new"?b.created.localeCompare(a.created):s==="bay"?String(a.bay).localeCompare(String(b.bay),undefined,{numeric:true}):s==="status"?rank[a.status]-rank[b.status]:TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail)));
   $("#jobs").innerHTML=jobs.map(j=>{
     const cur=current(j);
     const free=onShift.filter(e=>!cur.includes(e.id));
     const done=j.status==="done";
     const chips=done
-      ?[...new Set(j.assignments.map(a=>a.eng))].map(e=>`<span class="chip" style="padding-right:10px">${esc(engName(e))}</span>`).join("")
-      :cur.map(e=>`<span class="chip">${esc(engName(e))}<button data-un="${j.id}|${e}" title="Take off job">×</button></span>`).join("");
+      ?[...new Set(j.assignments.filter(a=>a.from).map(a=>a.eng))].map(e=>`<span class="chip" style="padding-right:10px">${esc(engName(e))}</span>`).join("")
+      :cur.map(e=>{const other=(w[e]||[]).filter(o=>o.id!==j.id);return `<span class="chip" ${other.length&&j.status!=="work"?`title="Currently on ${label(other[0])}"`:""}>${esc(engName(e))}${other.length?` <span class="sub">(on ${label(other[0])})</span>`:""}<button data-un="${j.id}|${e}" title="Take off job">×</button></span>`}).join("");
     const st=done?`<span class="status s-done">Complete</span><div class="sub">${fmt(j.completed)}</div>`
       :j.status==="work"?`<span class="status s-work">In work</span><div class="sub">since ${fmt(j.started)}</div>`
+      :j.status==="planned"?`<span class="status s-plan">Assigned – not started</span>`
       :`<span class="status s-open">Unmanned</span>`;
-    return `<tr class="${done?"done":""}">
+    const btns=done?`<button class="btn sm" data-reopen="${j.id}">Reopen</button>`
+      :j.status==="work"?`<button class="btn ok sm" data-done="${j.id}">Complete</button> <button class="btn sm" data-stop="${j.id}" title="Back to not started">Stop</button>`
+      :`<button class="btn pri sm" data-start="${j.id}" ${cur.length?"":"disabled title='Assign someone first'"}>Start</button> <button class="btn ok sm" data-done="${j.id}">Complete</button>`;
+    return `<tr class="${done?"done":""} row-${j.status}">
       <td><select data-f="tail" data-id="${j.id}" class="tail ${j.tail==="Off Aircraft"?"off":""}" ${done?"disabled":""} style="width:auto;border:0;padding:2px;font-weight:800">${TAILS.map(t=>`<option ${t===j.tail?"selected":""}>${t}</option>`).join("")}</select></td>
       <td><input data-f="bay" data-id="${j.id}" value="${esc(j.bay)}" ${done?"disabled":""} style="width:80px;padding:4px 6px"></td>
       <td class="task-text">${esc(j.task)}</td>
-      <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${busy[e.id]?" – re-task from "+esc(busy[e.id][0].tail):""}</option>`).join("")}</select></div>`}</td>
+      <td>${chips}${done?"":`<div class="inline-add"><select data-add="${j.id}"><option value="">+ Add engineer</option>${free.map(e=>`<option value="${e.id}">${esc(e.name)}${where(e.id)?" ("+where(e.id)+")":""}</option>`).join("")}</select></div>`}</td>
       <td>${st}</td>
-      <td style="white-space:nowrap">${done?`<button class="btn sm" data-reopen="${j.id}">Reopen</button>`:`<button class="btn ok sm" data-done="${j.id}">Complete</button>`} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
+      <td style="white-space:nowrap">${btns} <button class="btn warn sm" data-del="${j.id}" title="Delete">✕</button></td>
     </tr>`}).join("")||`<tr><td colspan="6" class="empty">No open jobs. Add one above.</td></tr>`;
 
-  const freeE=onShift.filter(e=>!busy[e.id]);
-  const busyE=onShift.filter(e=>busy[e.id]);
+  const freeE=onShift.filter(e=>!w[e.id]);
+  const busyE=onShift.filter(e=>w[e.id]);
   $("#cFree").textContent=freeE.length;$("#cBusy").textContent=busyE.length;
-  $("#freeList").innerHTML=freeE.map(e=>`<div class="p free">${esc(e.name)}</div>`).join("")||`<div class="sub">${onShift.length?"Everyone is tasked":"Nobody marked on shift – see Shift list"}</div>`;
-  $("#busyList").innerHTML=busyE.map(e=>{const j=busy[e.id][0];return `<div class="p busy">${esc(e.name)}<small>${esc(j.tail)}${j.bay?" · Bay "+esc(j.bay):""}<br>${esc(j.task.split("\n")[0].slice(0,28))}</small></div>`}).join("")||`<div class="sub">Nobody tasked</div>`;
+  $("#freeList").innerHTML=freeE.map(e=>`<div class="p free">${esc(e.name)}${p[e.id]?`<small>next: ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="sub">${onShift.length?"Everyone is working":"Nobody marked on shift – see Shift list"}</div>`;
+  $("#busyList").innerHTML=busyE.map(e=>`<div class="p busy">${esc(e.name)}<small>${w[e.id].map(j=>label(j)+" – "+esc(j.task.split("\n")[0].slice(0,24))).join("<br>")}${p[e.id]?`<br><span style="color:var(--mute)">next: ${p[e.id].map(label).join(", ")}</span>`:""}</small></div>`).join("")||`<div class="sub">Nobody working a job</div>`;
 }
 $("#jobs").addEventListener("click",e=>{
   const t=e.target;
   if(t.dataset.un){const[j,en]=t.dataset.un.split("|");unassign(j,en)}
   else if(t.dataset.done)complete(t.dataset.done);
+  else if(t.dataset.start)start(t.dataset.start);
+  else if(t.dataset.stop)stop(t.dataset.stop);
   else if(t.dataset.reopen)reopen(t.dataset.reopen);
   else if(t.dataset.del)del(t.dataset.del);
 });
@@ -303,9 +327,9 @@ $("#addEngs").onclick=()=>{
   $("#engPaste").value="";save();
 };
 $("#allOn").onclick=()=>{D.engineers.forEach(e=>e.onShift=true);save()};
-$("#allOff").onclick=()=>{if(confirm("Mark everyone off shift? Anyone still on a job is taken off it.")){const ts=now();D.engineers.forEach(e=>e.onShift=false);D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(!a.to)a.to=ts});if(j.status==="work")j.status="open"});save()}};
+$("#allOff").onclick=()=>{if(confirm("Mark everyone off shift? Anyone still on a job is taken off it.")){const ts=now();D.engineers.forEach(e=>e.onShift=false);D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(!a.to)a.to=ts});if(j.status!=="done")j.status="open"});save()}};
 function renderShift(){
-  const cnt={};D.jobs.filter(j=>j.status==="done").forEach(j=>new Set(j.assignments.map(a=>a.eng)).forEach(e=>cnt[e]=(cnt[e]||0)+1));
+  const cnt={};D.jobs.filter(j=>j.status==="done").forEach(j=>new Set(j.assignments.filter(a=>a.from).map(a=>a.eng)).forEach(e=>cnt[e]=(cnt[e]||0)+1));
   const list=[...D.engineers].sort((a,b)=>a.name.localeCompare(b.name));
   $("#engs").innerHTML=list.map(e=>`<tr>
     <td><input data-name="${e.id}" value="${esc(e.name)}" style="padding:4px 8px"></td>
@@ -316,7 +340,7 @@ function renderShift(){
 $("#engs").addEventListener("change",e=>{
   const t=e.target;
   if(t.dataset.on){const en=eng(t.dataset.on);en.onShift=t.checked;
-    if(!t.checked){const ts=now();D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(a.eng===en.id&&!a.to)a.to=ts});if(j.status==="work"&&!current(j).length)j.status="open"})}
+    if(!t.checked){const ts=now();D.jobs.filter(active).forEach(j=>{j.assignments.forEach(a=>{if(a.eng===en.id&&!a.to)a.to=ts});if(!current(j).length)j.status="open"})}
     save()}
   else if(t.dataset.name){const v=t.value.trim();if(v){eng(t.dataset.name).name=v;save()}}
 });
@@ -355,7 +379,7 @@ function histRows(){
   }).sort((a,b)=>b.completed.localeCompare(a.completed));
 }
 function whoDid(j){
-  const m={};j.assignments.forEach(a=>{m[a.eng]=(m[a.eng]||0)+((new Date(a.to||j.completed))-new Date(a.from))});
+  const m={};j.assignments.filter(a=>a.from).forEach(a=>{m[a.eng]=(m[a.eng]||0)+((new Date(a.to||j.completed))-new Date(a.from))});
   return Object.entries(m).map(([e,ms])=>({name:nameOf(e),mins:Math.round(ms/60000)}));
 }
 function renderHistory(){
