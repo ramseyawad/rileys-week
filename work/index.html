@@ -91,8 +91,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .lane h3{margin:0 0 .8vw;font-size:1.05vw;letter-spacing:.2vw;text-transform:uppercase;display:flex;align-items:center;gap:.6vw}
 .lane h3 i{width:.8vw;height:.8vw;border-radius:50%;display:inline-block}
 .lane h3 em{margin-left:auto;font-style:normal;background:rgba(255,255,255,.08);border-radius:99px;padding:0 .7vw;font-size:1vw}
-.lane .cards{flex:1;display:flex;flex-direction:column;gap:.8vw;overflow:hidden;min-height:0}
-.jc{background:linear-gradient(180deg,#15233A,#111C2F);border:1px solid rgba(255,255,255,.08);border-left:.45vw solid var(--c);border-radius:.8vw;padding:.8vw 1vw;animation:fadein .4s}
+.lane .cards{flex:1;display:block!important;overflow:hidden;min-height:0;position:relative}
+.lane .cards.scrolling{-webkit-mask-image:linear-gradient(transparent 0,#000 1.2vw,#000 calc(100% - 2.5vw),transparent 100%);mask-image:linear-gradient(transparent 0,#000 1.2vw,#000 calc(100% - 2.5vw),transparent 100%)}
+.track{display:flex;flex-direction:column;gap:.8vw;padding-bottom:.8vw}
+.side .track{gap:0}
+.jc{background:linear-gradient(180deg,#15233A,#111C2F);border:1px solid rgba(255,255,255,.08);border-left:.45vw solid var(--c);border-radius:.8vw;padding:.8vw 1vw}
 @keyframes fadein{from{opacity:0;transform:translateY(.4vw)}}
 .jc-top{display:flex;align-items:baseline;gap:.8vw}
 .jc-tail{font-size:2.1vw;font-weight:900;letter-spacing:.05vw;color:#fff;line-height:1}
@@ -516,16 +519,34 @@ function card(j){
   return `<div class="jc"><div class="jc-top"><span class="jc-tail ${off?"off":""}">${esc(off?"OFF AIRCRAFT":j.tail)}</span>${j.bay?`<span class="jc-bay">BAY ${esc(j.bay)}</span>`:""}</div>
     <ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
     <div class="jc-who">${who.length?who.map(n=>`<span>${esc(n)}</span>`).join(""):`<span class="none">Awaiting engineers</span>`}</div>
-    ${j.status==="work"?`<div class="jc-time">⏱ ${since(j.started)} in work</div>`:""}</div>`;
+    ${j.status==="work"?`<div class="jc-time">⏱ <span class="since" data-t="${j.started}"></span> in work</div>`:""}</div>`;
 }
-function fill(el,list,emptyMsg){
-  const box=$(el);box.innerHTML=list.map(card).join("")||`<div class="empty-lane">${emptyMsg}</div>`;
-  // trim cards that don't fit and show a "+N more"
-  const cards=[...box.children];let hidden=0;
-  for(let i=cards.length-1;i>0&&box.scrollHeight>box.clientHeight+2;i--){cards[i].remove();hidden++}
-  if(hidden){const m=document.createElement("div");m.className="more";m.textContent=`+ ${hidden} more`;box.append(m);
-    if(box.scrollHeight>box.clientHeight+2&&box.children.length>2){box.children[box.children.length-2].remove();m.textContent=`+ ${hidden+1} more`}}
+// Each lane scrolls smoothly in a loop when its content is taller than the lane.
+function fillHtml(el,html){
+  const box=$(el);
+  if(box.dataset.h!==html){
+    box.dataset.h=html;box.scrollTop=0;
+    box.innerHTML=`<div class="track">${html}</div>`;
+    const tr=box.firstElementChild;
+    const over=tr.offsetHeight>box.clientHeight+2;
+    box.classList.toggle("scrolling",over);
+    if(over){const c=tr.cloneNode(true);c.setAttribute("aria-hidden","true");box.append(c)}
+  }
+  box.querySelectorAll(".since").forEach(x=>x.textContent=since(x.dataset.t));
 }
+const fill=(el,list,msg)=>fillHtml(el,list.map(card).join("")||`<div class="empty-lane">${msg}</div>`);
+const SPEED=28; // pixels per second
+let lastT=0;
+function scrollLoop(t){
+  const dt=lastT?Math.min(100,t-lastT):0;lastT=t;
+  if(!$("#display").classList.contains("hide"))document.querySelectorAll("#display .cards.scrolling").forEach(box=>{
+    const loop=box.firstElementChild.offsetHeight;
+    box._y=((box._y||0)+SPEED*dt/1000)%loop;
+    box.scrollTop=box._y;
+  });
+  requestAnimationFrame(scrollLoop);
+}
+requestAnimationFrame(scrollLoop);
 function renderDisplay(){
   if($("#display").classList.contains("hide"))return;
   const d=new Date();
@@ -540,15 +561,15 @@ function renderDisplay(){
   const free=D.engineers.filter(e=>e.onShift&&!w[e.id]).sort((a,b)=>!!p[a.id]-!!p[b.id]||a.name.localeCompare(b.name));
   [["kWork",work],["nWork",work],["kNext",next],["nNext",next],["kOpen",open],["nOpen",open],["kDone",done],["nDone",done],["nFree",free]].forEach(([id,l])=>$("#"+id).textContent=l.length);
   fill("#lWork",work,"Nothing in work");fill("#lNext",next,"Nothing lined up");fill("#lOpen",open,"All jobs manned");
-  $("#lFree").innerHTML=free.map(e=>`<div class="pp">${esc(e.name)}${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`;
-  $("#lDone").innerHTML=done.slice(0,8).map(j=>`<div class="dl"><span><b>${esc(j.tail==="Off Aircraft"?"Off A/C":j.tail)}</b> ${esc(j.task.split("\n")[0].slice(0,22))}</span><span>${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")||`<div class="empty-lane">None yet</div>`;
+  fillHtml("#lFree",free.map(e=>`<div class="pp">${esc(e.name)}${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`);
+  fillHtml("#lDone",done.map(j=>`<div class="dl"><span><b>${esc(j.tail==="Off Aircraft"?"Off A/C":j.tail)}</b> ${esc(j.task.split("\n")[0].slice(0,22))}</span><span>${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")||`<div class="empty-lane">None yet</div>`);
 }
-function openDisplay(){$("#display").classList.remove("hide");if(location.hash!=="#display")history.replaceState(null,"","#display");
+function openDisplay(){$("#display").classList.remove("hide");document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");if(location.hash!=="#display")history.replaceState(null,"","#display");
   document.documentElement.requestFullscreen?.().catch(()=>{});renderDisplay()}
 function closeDisplay(){$("#display").classList.add("hide");history.replaceState(null,"",location.pathname);if(document.fullscreenElement)document.exitFullscreen()}
 $("#openDisplay").onclick=openDisplay;$("#dbExit").onclick=closeDisplay;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#display").classList.contains("hide")&&!document.fullscreenElement)closeDisplay()});
-window.addEventListener("resize",renderDisplay);
+window.addEventListener("resize",()=>{document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");renderDisplay()});
 setInterval(renderDisplay,15000);
 if(location.hash==="#display"){$("#display").classList.remove("hide")}
 
