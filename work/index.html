@@ -32,7 +32,11 @@ button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
 button.ok{background:var(--green);border-color:var(--green);color:#fff}
 button.warn{color:var(--red);border-color:#FCA5A5}
 button.sm{padding:4px 8px;font-size:13px}
-.addrow{display:grid;grid-template-columns:150px 110px 1fr 220px auto;gap:8px;align-items:start;margin-bottom:14px}
+.picker{display:flex;flex-wrap:wrap;gap:6px;border:1px solid #CBD5E1;border-radius:8px;padding:6px;min-height:40px;background:#fff}
+.pick{font:inherit;font-size:13px;font-weight:600;border:1px solid #CBD5E1;background:#F8FAFC;color:var(--ink);border-radius:999px;padding:5px 10px;cursor:pointer}
+.pick.sel{background:var(--blue);border-color:var(--blue);color:#fff}
+.pick.isbusy:not(.sel){color:var(--mute)}
+.addrow{display:grid;grid-template-columns:150px 110px 1fr 280px auto;gap:8px;align-items:start;margin-bottom:14px}
 @media(max-width:800px){.addrow{grid-template-columns:1fr 1fr}.addrow .task,.addrow .engs{grid-column:1/-1}}
 .tail{font-weight:800;font-size:16px;white-space:nowrap}
 .tail.off{color:var(--amber)}
@@ -86,7 +90,7 @@ button.sm{padding:4px 8px;font-size:13px}
         <select id="nTail"></select>
         <input id="nBay" placeholder="Bay">
         <textarea id="nTask" class="task" placeholder="Task / tasks"></textarea>
-        <select id="nEng" class="engs" multiple size="3" title="Hold Ctrl / Cmd to pick more than one"></select>
+        <div id="nEng" class="engs picker"></div>
         <button class="btn pri" id="addJob">Add job</button>
       </div>
       <div class="toolbar">
@@ -202,13 +206,17 @@ $("#nTail").innerHTML=TAILS.map(t=>`<option>${t}</option>`).join("");
 $("#addJob").onclick=()=>{
   const task=$("#nTask").value.trim();
   if(!task){$("#nTask").focus();return}
-  const engs=[...$("#nEng").selectedOptions].map(o=>o.value);
+  const engs=[...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id);
   const t=now();
   D.jobs.push({id:uid(),tail:$("#nTail").value,bay:$("#nBay").value.trim(),task,status:engs.length?"work":"open",
     created:t,started:engs.length?t:null,completed:null,assignments:engs.map(e=>({eng:e,from:t,to:null}))});
+  const nid=D.jobs[D.jobs.length-1].id;
+  D.jobs.filter(o=>active(o)&&o.id!==nid).forEach(o=>{o.assignments.forEach(a=>{if(engs.includes(a.eng)&&!a.to)a.to=t});if(o.status==="work"&&!current(o).length)o.status="open"});
   $("#nTask").value="";$("#nBay").value="";
+  $("#nEng").querySelectorAll(".pick.sel").forEach(b=>b.classList.remove("sel"));
   save();
 };
+$("#nEng").addEventListener("click",e=>{const b=e.target.closest(".pick");if(b)b.classList.toggle("sel")});
 $("#showDone").onchange=render;$("#sortBy").onchange=render;
 
 function assign(jobId,engId){
@@ -244,7 +252,8 @@ function editField(jobId,field,val){const j=D.jobs.find(x=>x.id===jobId);j[field
 function renderBoard(){
   const busy=busyMap();
   const onShift=D.engineers.filter(e=>e.onShift);
-  $("#nEng").innerHTML=onShift.map(e=>`<option value="${e.id}">${esc(e.name)}${busy[e.id]?" (on "+esc(busy[e.id][0].tail)+")":""}</option>`).join("")||"";
+  const keep=new Set([...$("#nEng").querySelectorAll(".pick.sel")].map(b=>b.dataset.id));
+  $("#nEng").innerHTML=onShift.map(e=>`<button type="button" class="pick${keep.has(e.id)?" sel":""}${busy[e.id]?" isbusy":""}" data-id="${e.id}" title="${busy[e.id]?"Currently on "+esc(busy[e.id][0].tail)+" – picking re-tasks them":""}">${esc(e.name)}${busy[e.id]?" · "+esc(busy[e.id][0].tail):""}</button>`).join("")||`<span class="sub">Tick people on shift in Shift list</span>`;
   const sod=new Date();sod.setHours(sod.getHours()<6?-18:0,0,0,0);
   let jobs=D.jobs.filter(j=>active(j)||($("#showDone").checked&&new Date(j.completed)>=sod));
   const s=$("#sortBy").value;
