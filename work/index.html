@@ -12,7 +12,7 @@
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
 header{background:var(--ink);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
 header h1{font-size:18px;margin:0;letter-spacing:.3px}
-header .clock{margin-left:auto;font-variant-numeric:tabular-nums;color:#CBD5E1}
+header .clock{font-variant-numeric:tabular-nums;color:#CBD5E1}
 nav{display:flex;gap:4px}
 nav button{background:transparent;color:#CBD5E1;border:0;padding:8px 14px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer}
 nav button.on{background:#1E293B;color:#fff}
@@ -72,6 +72,55 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .switch input{width:20px;height:20px}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .hide{display:none!important}
+
+/* ---------- DISPLAY BOARD ---------- */
+#display{position:fixed;inset:0;z-index:50;background:radial-gradient(1200px 600px at 10% -10%,#1E3A5F 0%,#0B1220 55%) #0B1220;color:#E2E8F0;display:flex;flex-direction:column;padding:1.4vw 1.6vw;gap:1.2vw;font-size:1vw;overflow:hidden}
+#display.hide{display:none}
+.db-top{display:flex;align-items:center;gap:1.5vw}
+.db-title{font-size:2.2vw;font-weight:800;letter-spacing:.15vw;text-transform:uppercase;color:#fff}
+.db-title small{display:block;font-size:.9vw;letter-spacing:.3vw;color:#64748B;font-weight:700}
+.db-kpis{display:flex;gap:1vw;margin-left:auto}
+.db-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:.8vw;padding:.5vw 1.2vw;text-align:center;min-width:7vw}
+.db-kpi b{display:block;font-size:2.2vw;line-height:1.1;font-variant-numeric:tabular-nums}
+.db-kpi span{font-size:.75vw;letter-spacing:.15vw;text-transform:uppercase;color:#94A3B8;font-weight:700}
+.db-clock{text-align:right;margin-left:1.5vw}
+.db-clock b{display:block;font-size:3.2vw;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;color:#fff}
+.db-clock span{font-size:1vw;color:#94A3B8;font-weight:600}
+.db-body{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 17vw;gap:1.2vw;min-height:0}
+.lane{display:flex;flex-direction:column;min-height:0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:1vw;padding:.9vw}
+.lane h3{margin:0 0 .8vw;font-size:1.05vw;letter-spacing:.2vw;text-transform:uppercase;display:flex;align-items:center;gap:.6vw}
+.lane h3 i{width:.8vw;height:.8vw;border-radius:50%;display:inline-block}
+.lane h3 em{margin-left:auto;font-style:normal;background:rgba(255,255,255,.08);border-radius:99px;padding:0 .7vw;font-size:1vw}
+.lane .cards{flex:1;display:flex;flex-direction:column;gap:.8vw;overflow:hidden;min-height:0}
+.jc{background:linear-gradient(180deg,#15233A,#111C2F);border:1px solid rgba(255,255,255,.08);border-left:.45vw solid var(--c);border-radius:.8vw;padding:.8vw 1vw;animation:fadein .4s}
+@keyframes fadein{from{opacity:0;transform:translateY(.4vw)}}
+.jc-top{display:flex;align-items:baseline;gap:.8vw}
+.jc-tail{font-size:2.1vw;font-weight:900;letter-spacing:.05vw;color:#fff;line-height:1}
+.jc-tail.off{font-size:1.5vw;color:#FBBF24}
+.jc-bay{margin-left:auto;background:var(--c);color:#0B1220;font-weight:900;border-radius:.4vw;padding:.15vw .6vw;font-size:1.1vw;white-space:nowrap}
+.jc-tasks{margin:.5vw 0 .6vw;padding:0;list-style:none;font-size:1.15vw;color:#CBD5E1;line-height:1.35}
+.jc-tasks li{padding-left:1vw;position:relative}
+.jc-tasks li:before{content:"";position:absolute;left:0;top:.55vw;width:.4vw;height:.4vw;border-radius:50%;background:var(--c)}
+.jc-who{display:flex;flex-wrap:wrap;gap:.4vw}
+.jc-who span{background:rgba(255,255,255,.08);border-radius:99px;padding:.2vw .8vw;font-size:1.05vw;font-weight:700;color:#fff}
+.jc-who .none{background:transparent;color:#F59E0B;font-style:italic;padding:0}
+.jc-time{font-size:.85vw;color:#94A3B8;margin-top:.5vw;font-weight:600}
+.lane.work{--c:#38BDF8}.lane.next{--c:#A78BFA}.lane.open{--c:#F59E0B}
+.lane.work h3 i{background:#38BDF8;box-shadow:0 0 .8vw #38BDF8;animation:pulse 2s infinite}
+.lane.next h3 i{background:#A78BFA}.lane.open h3 i{background:#F59E0B}
+@keyframes pulse{50%{opacity:.35}}
+.side{display:flex;flex-direction:column;gap:1.2vw;min-height:0}
+.side .lane{flex:1}
+.lane.free{--c:#22C55E}.lane.free h3 i{background:#22C55E}
+.pp{display:flex;justify-content:space-between;align-items:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#BBF7D0;border-radius:.6vw;padding:.45vw .8vw;font-weight:700;font-size:1.15vw;margin-bottom:.45vw}
+.pp small{font-size:.8vw;color:#A78BFA;font-weight:700}
+.lane.donel{--c:#64748B}.lane.donel h3 i{background:#64748B}
+.dl{display:flex;justify-content:space-between;font-size:.95vw;color:#94A3B8;padding:.35vw 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.dl b{color:#E2E8F0}
+.empty-lane{color:#475569;font-size:1.1vw;text-align:center;padding:2vw 0;font-style:italic}
+.more{color:#94A3B8;text-align:center;font-weight:700;font-size:1vw}
+.db-exit{position:absolute;bottom:.6vw;right:.6vw;opacity:0;background:#1E293B;color:#fff;border:0;border-radius:.5vw;padding:.4vw .8vw;cursor:pointer;font-size:.9vw;transition:opacity .2s}
+#display:hover .db-exit{opacity:1}
 </style>
 </head>
 <body>
@@ -82,7 +131,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <button data-tab="shift">Shift list</button>
     <button data-tab="history">History</button>
   </nav>
-  <span class="clock" id="clock"></span>
+  <button class="btn" id="openDisplay" style="background:#1E293B;color:#fff;border-color:#334155">📺 Wall board</button>
+  <span class="clock" id="clock" style="margin-left:auto"></span>
 </header>
 
 <main>
@@ -175,6 +225,29 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </section>
 </main>
 
+
+<div id="display" class="hide">
+  <button class="db-exit" id="dbExit">✕ Exit (Esc)</button>
+  <div class="db-top">
+    <div class="db-title">Line Tasking<small>LIVE WORK ALLOCATION</small></div>
+    <div class="db-kpis">
+      <div class="db-kpi"><b id="kWork">0</b><span>In work</span></div>
+      <div class="db-kpi"><b id="kNext">0</b><span>Next up</span></div>
+      <div class="db-kpi"><b id="kOpen">0</b><span>Unmanned</span></div>
+      <div class="db-kpi"><b id="kDone">0</b><span>Done this shift</span></div>
+    </div>
+    <div class="db-clock"><b id="dTime"></b><span id="dDate"></span></div>
+  </div>
+  <div class="db-body">
+    <div class="lane work"><h3><i></i>In work<em id="nWork">0</em></h3><div class="cards" id="lWork"></div></div>
+    <div class="lane next"><h3><i></i>Next up<em id="nNext">0</em></h3><div class="cards" id="lNext"></div></div>
+    <div class="lane open"><h3><i></i>Unmanned<em id="nOpen">0</em></h3><div class="cards" id="lOpen"></div></div>
+    <div class="side">
+      <div class="lane free"><h3><i></i>Available<em id="nFree">0</em></h3><div class="cards" id="lFree" style="display:block"></div></div>
+      <div class="lane donel"><h3><i></i>Completed<em id="nDone">0</em></h3><div class="cards" id="lDone" style="display:block"></div></div>
+    </div>
+  </div>
+</div>
 <script>
 (()=>{
 const KEY="wa-data-v1";
@@ -432,8 +505,55 @@ $("#exportCsv").onclick=()=>{
   download(`work-record-${new Date().toISOString().slice(0,10)}.csv`,lines.join("\n"),"text/csv");
 };
 
+
+/* ---------- wall board ---------- */
+const shiftStart=()=>{const d=new Date(),h=d.getHours();d.setMinutes(0,0,0);if(h>=6&&h<18)d.setHours(6);else{if(h<6)d.setDate(d.getDate()-1);d.setHours(18)}return d};
+const since=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
+function card(j){
+  const who=current(j).map(engName);
+  const tasks=j.task.split("\n").map(t=>t.trim()).filter(Boolean);
+  const off=j.tail==="Off Aircraft";
+  return `<div class="jc"><div class="jc-top"><span class="jc-tail ${off?"off":""}">${esc(off?"OFF AIRCRAFT":j.tail)}</span>${j.bay?`<span class="jc-bay">BAY ${esc(j.bay)}</span>`:""}</div>
+    <ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="jc-who">${who.length?who.map(n=>`<span>${esc(n)}</span>`).join(""):`<span class="none">Awaiting engineers</span>`}</div>
+    ${j.status==="work"?`<div class="jc-time">⏱ ${since(j.started)} in work</div>`:""}</div>`;
+}
+function fill(el,list,emptyMsg){
+  const box=$(el);box.innerHTML=list.map(card).join("")||`<div class="empty-lane">${emptyMsg}</div>`;
+  // trim cards that don't fit and show a "+N more"
+  const cards=[...box.children];let hidden=0;
+  for(let i=cards.length-1;i>0&&box.scrollHeight>box.clientHeight+2;i--){cards[i].remove();hidden++}
+  if(hidden){const m=document.createElement("div");m.className="more";m.textContent=`+ ${hidden} more`;box.append(m);
+    if(box.scrollHeight>box.clientHeight+2&&box.children.length>2){box.children[box.children.length-2].remove();m.textContent=`+ ${hidden+1} more`}}
+}
+function renderDisplay(){
+  if($("#display").classList.contains("hide"))return;
+  const d=new Date();
+  $("#dTime").textContent=d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  $("#dDate").textContent=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  const byTail=(a,b)=>TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail);
+  const act=D.jobs.filter(active);
+  const work=act.filter(j=>j.status==="work").sort(byTail),next=act.filter(j=>j.status==="planned").sort(byTail),open=act.filter(j=>j.status==="open").sort(byTail);
+  const ss=shiftStart();
+  const done=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=ss).sort((a,b)=>b.completed.localeCompare(a.completed));
+  const {w,p}=jobMaps();
+  const free=D.engineers.filter(e=>e.onShift&&!w[e.id]).sort((a,b)=>!!p[a.id]-!!p[b.id]||a.name.localeCompare(b.name));
+  [["kWork",work],["nWork",work],["kNext",next],["nNext",next],["kOpen",open],["nOpen",open],["kDone",done],["nDone",done],["nFree",free]].forEach(([id,l])=>$("#"+id).textContent=l.length);
+  fill("#lWork",work,"Nothing in work");fill("#lNext",next,"Nothing lined up");fill("#lOpen",open,"All jobs manned");
+  $("#lFree").innerHTML=free.map(e=>`<div class="pp">${esc(e.name)}${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`;
+  $("#lDone").innerHTML=done.slice(0,8).map(j=>`<div class="dl"><span><b>${esc(j.tail==="Off Aircraft"?"Off A/C":j.tail)}</b> ${esc(j.task.split("\n")[0].slice(0,22))}</span><span>${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")||`<div class="empty-lane">None yet</div>`;
+}
+function openDisplay(){$("#display").classList.remove("hide");if(location.hash!=="#display")history.replaceState(null,"","#display");
+  document.documentElement.requestFullscreen?.().catch(()=>{});renderDisplay()}
+function closeDisplay(){$("#display").classList.add("hide");history.replaceState(null,"",location.pathname);if(document.fullscreenElement)document.exitFullscreen()}
+$("#openDisplay").onclick=openDisplay;$("#dbExit").onclick=closeDisplay;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#display").classList.contains("hide")&&!document.fullscreenElement)closeDisplay()});
+window.addEventListener("resize",renderDisplay);
+setInterval(renderDisplay,15000);
+if(location.hash==="#display"){$("#display").classList.remove("hide")}
+
 /* ---------- render ---------- */
-function render(){renderBoard();
+function render(){renderBoard();renderDisplay();
   if(!$("#tab-shift").classList.contains("hide"))renderShift();
   if(!$("#tab-history").classList.contains("hide"))renderHistory();}
 window.addEventListener("storage",e=>{if(e.key===KEY){try{D=JSON.parse(e.newValue)}catch(_){}render()}});
