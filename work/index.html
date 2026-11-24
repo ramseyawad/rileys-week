@@ -234,58 +234,41 @@ th.today,td.today{background:#FFFBEB}
 #toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
 #toast button{font:inherit;font-weight:700;color:#93C5FD;background:transparent;border:0;cursor:pointer;padding:2px 4px}
 /* ---------- DISPLAY BOARD ---------- */
-#display{position:fixed;inset:0;z-index:50;background:radial-gradient(1200px 600px at 10% -10%,#1E3A5F 0%,#0B1220 55%) #0B1220;color:#E2E8F0;display:flex;flex-direction:column;padding:1.4vw 1.6vw;gap:1.2vw;font-size:1vw;overflow:hidden}
+#display{position:fixed;inset:0;z-index:50;background:#070B14;color:#E2E8F0;display:flex;flex-direction:column;padding:1.6vw 1.8vw;gap:1.4vw;font-size:1vw;overflow:hidden;font-family:Inter,system-ui,"Segoe UI",sans-serif}
 #display.hide{display:none}
-.db-top{display:flex;align-items:center;gap:1.5vw}
-.db-title{font-size:2.2vw;font-weight:800;letter-spacing:.15vw;text-transform:uppercase;color:#fff}
-.db-title small{display:block;font-size:.9vw;letter-spacing:.3vw;color:#64748B;font-weight:700}
-.db-kpis{display:flex;gap:1vw;margin-left:auto}
-.db-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:.8vw;padding:.5vw 1.2vw;text-align:center;min-width:7vw}
-.db-kpi b{display:block;font-size:2.2vw;line-height:1.1;font-variant-numeric:tabular-nums}
-.db-kpi span{font-size:.75vw;letter-spacing:.15vw;text-transform:uppercase;color:#94A3B8;font-weight:700}
-.db-clock{text-align:right;margin-left:1.5vw}
-.db-clock b{display:block;font-size:3.2vw;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;color:#fff}
+.db-top{display:flex;align-items:center;gap:2vw}
+.db-title{font-size:2.2vw;font-weight:900;letter-spacing:.15vw;text-transform:uppercase;color:#fff;line-height:1}
+.db-title small{display:block;font-size:.85vw;letter-spacing:.35vw;color:#64748B;font-weight:700;margin-top:.4vw}
+.db-legend{display:flex;gap:1.2vw;margin-left:auto}
+.lg{display:flex;align-items:center;gap:.6vw;font-size:1.05vw;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.1vw}
+.lg b{font-size:2vw;color:#fff;font-variant-numeric:tabular-nums}
+.lg i{width:1vw;height:1vw;border-radius:50%;background:var(--g);box-shadow:0 0 .8vw var(--g)}
+.red{--g:#EF4444}.amber{--g:#F59E0B}.green{--g:#22C55E}
+.db-clock{text-align:right;margin-left:2vw}
+.db-clock b{display:block;font-size:3.2vw;line-height:1;font-weight:900;font-variant-numeric:tabular-nums;color:#fff}
 .db-clock span{font-size:1vw;color:#94A3B8;font-weight:600}
-.db-body{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 17vw;gap:1.2vw;min-height:0}
-.lane{display:flex;flex-direction:column;min-height:0;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:1vw;padding:.9vw}
-.lane h3{margin:0 0 .8vw;font-size:1.05vw;letter-spacing:.2vw;text-transform:uppercase;display:flex;align-items:center;gap:.6vw}
-.lane h3 i{width:.8vw;height:.8vw;border-radius:50%;display:inline-block}
-.lane h3 em{margin-left:auto;font-style:normal;background:rgba(255,255,255,.08);border-radius:99px;padding:0 .7vw;font-size:1vw}
-.lane .cards{flex:1;display:block!important;overflow:hidden;min-height:0;position:relative}
-.lane .cards.scrolling{-webkit-mask-image:linear-gradient(transparent 0,#000 1.2vw,#000 calc(100% - 2.5vw),transparent 100%);mask-image:linear-gradient(transparent 0,#000 1.2vw,#000 calc(100% - 2.5vw),transparent 100%)}
-.track{display:flex;flex-direction:column;gap:.8vw;padding-bottom:.8vw}
-.side .track{gap:0}
-.jc{background:linear-gradient(180deg,#15233A,#111C2F);border:1px solid rgba(255,255,255,.08);border-left:.45vw solid var(--c);border-radius:.8vw;padding:.8vw 1vw}
-@keyframes fadein{from{opacity:0;transform:translateY(.4vw)}}
-.jc-top{display:flex;align-items:baseline;gap:.8vw}
-.jc-tail{font-size:2.1vw;font-weight:900;letter-spacing:.05vw;color:#fff;line-height:1}
-.jc-tail.off{font-size:1.5vw;color:#FBBF24}
-.jc-bay{margin-left:auto;background:var(--c);color:#0B1220;font-weight:900;border-radius:.4vw;padding:.15vw .6vw;font-size:1.1vw;white-space:nowrap}
-.jc-tasks{margin:.5vw 0 .6vw;padding:0;list-style:none;font-size:1.15vw;color:#CBD5E1;line-height:1.35}
-.jc-tasks li{padding-left:1vw;position:relative}
-.jc-tasks li:before{content:"";position:absolute;left:0;top:.55vw;width:.4vw;height:.4vw;border-radius:50%;background:var(--c)}
-.jc-who{display:flex;flex-wrap:wrap;gap:.4vw}
-.jc-row{display:grid;grid-template-columns:4.6vw 1fr;gap:.6vw;align-items:start;margin-top:.55vw}
-.jc-row>b{font-size:.8vw;letter-spacing:.12vw;color:#64748B;font-weight:800;padding-top:.3vw}
-.jc-row .jc-tasks{margin:0}
-.jc-who span{background:rgba(255,255,255,.08);border-radius:99px;padding:.2vw .8vw;font-size:1.05vw;font-weight:700;color:#fff}
-.jc-who .none{background:transparent;color:#F59E0B;font-style:italic;padding:.2vw 0;font-size:1vw}
-.jc-time{font-size:.85vw;color:#94A3B8;margin-top:.5vw;font-weight:600}
-.lane.work{--c:#38BDF8}.lane.next{--c:#A78BFA}.lane.open{--c:#F59E0B}
-.lane.work h3 i{background:#38BDF8;box-shadow:0 0 .8vw #38BDF8;animation:pulse 2s infinite}
-.lane.next h3 i{background:#A78BFA}.lane.open h3 i{background:#F59E0B}
-@keyframes pulse{50%{opacity:.35}}
-.side{display:flex;flex-direction:column;gap:1.2vw;min-height:0}
-.side .lane{flex:1}
-.lane.free{--c:#22C55E}.lane.free h3 i{background:#22C55E}
-.pp{display:flex;justify-content:space-between;align-items:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#BBF7D0;border-radius:.6vw;padding:.45vw .8vw;font-weight:700;font-size:1.15vw;margin-bottom:.45vw}
-.pp .ptr{white-space:nowrap;font-size:.72vw;color:#86EFAC;opacity:.75;font-weight:700;margin-left:.3vw}
-.pp small{font-size:.8vw;color:#A78BFA;font-weight:700}
-.lane.donel{--c:#64748B}.lane.donel h3 i{background:#64748B}
-.dl{display:flex;justify-content:space-between;font-size:.95vw;color:#94A3B8;padding:.35vw 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.dl b{color:#E2E8F0}
-.empty-lane{color:#475569;font-size:1.1vw;text-align:center;padding:2vw 0;font-style:italic}
-.more{color:#94A3B8;text-align:center;font-weight:700;font-size:1vw}
+#dbGrid{flex:1;min-height:0;overflow:hidden;position:relative;padding:1vw .6vw 0}
+#dbGrid.scrolling{-webkit-mask-image:linear-gradient(transparent 0,#000 1.5vw,#000 calc(100% - 3vw),transparent 100%);mask-image:linear-gradient(transparent 0,#000 1.5vw,#000 calc(100% - 3vw),transparent 100%)}
+#dbGrid .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(21vw,1fr));gap:1.6vw;padding-bottom:1.6vw;align-items:start}
+.jc{--g:#EF4444;background:linear-gradient(180deg,#101828,#0C1322);border:.12vw solid color-mix(in srgb,var(--g) 70%,transparent);border-radius:1vw;padding:1.1vw 1.3vw 1.2vw;box-shadow:0 0 1.4vw color-mix(in srgb,var(--g) 45%,transparent),inset 0 0 1.2vw color-mix(in srgb,var(--g) 10%,transparent)}
+.jc.amber{--g:#F59E0B;animation:glow 2.4s ease-in-out infinite}
+.jc.red{animation:glow 1.6s ease-in-out infinite}
+.jc.green{--g:#22C55E;opacity:.8}
+@keyframes glow{50%{box-shadow:0 0 2.4vw color-mix(in srgb,var(--g) 70%,transparent),inset 0 0 1.6vw color-mix(in srgb,var(--g) 18%,transparent)}}
+.jc-top{display:flex;align-items:center;gap:.8vw}
+.jc-tail{white-space:nowrap;font-size:2.4vw;font-weight:900;color:#fff;line-height:1;letter-spacing:.05vw}
+.jc-tail.off{font-size:1.6vw}
+.jc-bay{white-space:nowrap;font-size:1.15vw;font-weight:800;color:#CBD5E1;background:rgba(255,255,255,.08);border-radius:.4vw;padding:.15vw .6vw}
+.jc-st{white-space:nowrap;margin-left:auto;font-size:.85vw;font-weight:800;letter-spacing:.12vw;text-transform:uppercase;color:var(--g)}
+.jc-tasks{margin:.8vw 0;padding:0;list-style:none;font-size:1.25vw;color:#E2E8F0;line-height:1.35;font-weight:600}
+.jc-tasks li{padding-left:1.1vw;position:relative}
+.jc-tasks li:before{content:"";position:absolute;left:0;top:.6vw;width:.45vw;height:.45vw;border-radius:50%;background:var(--g)}
+.jc-who{display:flex;flex-wrap:wrap;gap:.45vw;border-top:1px solid rgba(255,255,255,.07);padding-top:.8vw}
+.jc-who span{background:rgba(255,255,255,.07);border-radius:99px;padding:.25vw .8vw;font-size:1.05vw;font-weight:700;color:#fff;white-space:nowrap}
+.jc-who span em{font-style:normal;font-size:.75vw;color:#94A3B8;margin-left:.3vw}
+.jc-who .none{background:transparent;color:#F87171;font-style:italic;padding:.25vw 0}
+.jc-time{font-size:.9vw;color:#94A3B8;margin-top:.6vw;font-weight:600}
+.empty-lane{grid-column:1/-1;color:#475569;font-size:1.6vw;text-align:center;padding:8vw 0;font-style:italic}
 .db-exit{position:absolute;bottom:.6vw;right:.6vw;opacity:0;background:#1E293B;color:#fff;border:0;border-radius:.5vw;padding:.4vw .8vw;cursor:pointer;font-size:.9vw;transition:opacity .2s}
 #display:hover .db-exit{opacity:1}
 </style>
@@ -441,24 +424,15 @@ th.today,td.today{background:#FFFBEB}
 <div id="display" class="hide">
   <button class="db-exit" id="dbExit">✕ Exit (Esc)</button>
   <div class="db-top">
-    <div class="db-title">Line Tasking<small>LIVE WORK ALLOCATION</small></div>
-    <div class="db-kpis">
-      <div class="db-kpi"><b id="kWork">0</b><span>In work</span></div>
-      <div class="db-kpi"><b id="kNext">0</b><span>Next up</span></div>
-      <div class="db-kpi"><b id="kOpen">0</b><span>Unmanned</span></div>
-      <div class="db-kpi"><b id="kDone">0</b><span>Done this shift</span></div>
+    <div class="db-title">Line Tasking<small>LIVE JOBS</small></div>
+    <div class="db-legend">
+      <span class="lg red"><i></i><b id="kOpen">0</b> Not working</span>
+      <span class="lg amber"><i></i><b id="kWork">0</b> In progress</span>
+      <span class="lg green"><i></i><b id="kDone">0</b> Complete</span>
     </div>
     <div class="db-clock"><b id="dTime"></b><span id="dDate"></span></div>
   </div>
-  <div class="db-body">
-    <div class="lane work"><h3><i></i>In work<em id="nWork">0</em></h3><div class="cards" id="lWork"></div></div>
-    <div class="lane next"><h3><i></i>Next up<em id="nNext">0</em></h3><div class="cards" id="lNext"></div></div>
-    <div class="lane open"><h3><i></i>Unmanned<em id="nOpen">0</em></h3><div class="cards" id="lOpen"></div></div>
-    <div class="side">
-      <div class="lane free"><h3><i></i>Available<em id="nFree">0</em></h3><div class="cards" id="lFree" style="display:block"></div></div>
-      <div class="lane donel"><h3><i></i>Completed<em id="nDone">0</em></h3><div class="cards" id="lDone" style="display:block"></div></div>
-    </div>
-  </div>
+  <div class="cards" id="dbGrid"></div>
 </div>
 <script>
 (()=>{
@@ -857,15 +831,17 @@ $("#exportCsv").onclick=()=>{
 const shiftStart=()=>{const d=new Date(),h=d.getHours();d.setMinutes(0,0,0);if(h>=6&&h<18)d.setHours(6);else{if(h<6)d.setDate(d.getDate()-1);d.setHours(18)}return d};
 const since=iso=>{const m=Math.max(0,Math.round((Date.now()-new Date(iso))/60000));return m<60?m+" min":Math.floor(m/60)+"h "+String(m%60).padStart(2,"0")+"m"};
 function card(j){
-  const who=current(j).map(eng).filter(Boolean);
-  const b1=who.filter(e=>tradeIx(e)===1),b2=who.filter(e=>tradeIx(e)===2),mech=who.filter(e=>tradeIx(e)>2),oth=who.filter(e=>tradeIx(e)===0);
+  const done=j.status==="done";
+  const ids=done?[...new Set(j.assignments.filter(a=>a.from).map(a=>a.eng))]:current(j);
+  const who=ids.map(id=>eng(id)||(D.archived||[]).find(x=>x.id===id)).filter(Boolean).sort(byTrade);
   const tasks=j.task.split("\n").map(t=>t.trim()).filter(Boolean);
   const off=j.tail==="Off Aircraft";
-  const line=(l,list,empty)=>`<div class="jc-row"><b>${l}</b><div class="jc-who">${list.length?list.map(e=>`<span>${esc(e.name)}</span>`).join(""):`<span class="none">${empty}</span>`}</div></div>`;
-  return `<div class="jc"><div class="jc-top"><span class="jc-tail ${off?"off":""}">${esc(off?"OFF AIRCRAFT":j.tail)}</span>${j.bay?`<span class="jc-bay">BAY ${esc(j.bay)}</span>`:""}</div>
-    ${line("B1",b1,"No B1")}${line("B2",b2,"No B2")}${line("MECHS",mech,"No mechs")}${oth.length?line("OTHER",oth,""):""}
-    <div class="jc-row"><b>JOB</b><ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
-    ${j.status==="work"?`<div class="jc-time">⏱ <span class="since" data-t="${j.started}"></span> in work</div>`:""}</div>`;
+  const cls=done?"green":j.status==="work"?"amber":"red";
+  const st=done?"Complete":j.status==="work"?"In progress":who.length?"Not started":"Unmanned";
+  return `<div class="jc ${cls}"><div class="jc-top"><span class="jc-tail ${off?"off":""}">${esc(off?"OFF AIRCRAFT":j.tail)}</span>${j.bay?`<span class="jc-bay">BAY ${esc(j.bay)}</span>`:""}<span class="jc-st">${st}</span></div>
+    <ul class="jc-tasks">${tasks.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    <div class="jc-who">${who.length?who.map(e=>`<span>${esc(e.name)}${e.cat?`<em>${esc(catShort(e))}</em>`:""}</span>`).join(""):`<span class="none">Nobody assigned</span>`}</div>
+    ${j.status==="work"?`<div class="jc-time">⏱ <span class="since" data-t="${j.started}"></span> in progress</div>`:done?`<div class="jc-time">✓ ${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</div>`:""}</div>`;
 }
 // Each lane scrolls smoothly in a loop when its content is taller than the lane.
 function fillHtml(el,html){
@@ -900,15 +876,10 @@ function renderDisplay(){
   $("#dDate").textContent=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   const byTail=(a,b)=>TAILS.indexOf(a.tail)-TAILS.indexOf(b.tail);
   const act=D.jobs.filter(active);
-  const work=act.filter(j=>j.status==="work").sort(byTail),next=act.filter(j=>j.status==="planned").sort(byTail),open=act.filter(j=>j.status==="open").sort(byTail);
-  const ss=shiftStart();
-  const done=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=ss).sort((a,b)=>b.completed.localeCompare(a.completed));
-  const {w,p}=jobMaps();
-  const free=D.engineers.filter(e=>e.onShift&&!w[e.id]).sort((a,b)=>!!p[a.id]-!!p[b.id]||a.name.localeCompare(b.name));
-  [["kWork",work],["nWork",work],["kNext",next],["nNext",next],["kOpen",open],["nOpen",open],["kDone",done],["nDone",done],["nFree",free]].forEach(([id,l])=>$("#"+id).textContent=l.length);
-  fill("#lWork",work,"Nothing in work");fill("#lNext",next,"Nothing lined up");fill("#lOpen",open,"All jobs manned");
-  fillHtml("#lFree",[...free].sort((a,b)=>!!p[a.id]-!!p[b.id]||byTrade(a,b)).map(e=>`<div class="pp"><span>${esc(e.name)}${e.cat?` <span class="ptr">${esc(catShort(e))}</span>`:""}</span>${p[e.id]?`<small>next ${p[e.id].map(label).join(", ")}</small>`:""}</div>`).join("")||`<div class="empty-lane">Everyone tasked</div>`);
-  fillHtml("#lDone",done.map(j=>`<div class="dl"><span><b>${esc(j.tail==="Off Aircraft"?"Off A/C":j.tail)}</b> ${esc(j.task.split("\n")[0].slice(0,22))}</span><span>${new Date(j.completed).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")||`<div class="empty-lane">None yet</div>`);
+  const work=act.filter(j=>j.status==="work").sort(byTail),idle=act.filter(j=>j.status!=="work").sort(byTail);
+  const done=D.jobs.filter(j=>j.status==="done"&&new Date(j.completed)>=shiftStart()).sort((a,b)=>b.completed.localeCompare(a.completed));
+  $("#kOpen").textContent=idle.length;$("#kWork").textContent=work.length;$("#kDone").textContent=done.length;
+  fillHtml("#dbGrid",[...idle,...work,...done].map(card).join("")||`<div class="empty-lane">No jobs raised this shift</div>`);
 }
 function openDisplay(){$("#display").classList.remove("hide");document.querySelectorAll("#display .cards").forEach(b=>b.dataset.h="");if(location.hash!=="#display")history.replaceState(null,"","#display");
   document.documentElement.requestFullscreen?.().catch(()=>{});renderDisplay()}
